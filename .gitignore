@@ -1,0 +1,8 @@
+.history/
+eduguard-api/
+node_modules/
+venv/
+.env
+*.db
+keys/
+certs/
