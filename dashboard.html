@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduGuard MDM — Admin Dashboard</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" /></noscript>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+
+  <style>
+    /* === CSS CUSTOM PROPERTIES === */
+    :root {
+      --green-900: #0D3D22;
+      --green-800: #1A6B3C;
+      --green-700: #218F4E;
+      --green-600: #27A85F;
+      --green-100: #E8F5EE;
+      --green-50:  #F2FAF5;
+      --amber:     #F5A623;
+      --amber-dark:#C8841A;
+      --amber-light:#FEF3DC;
+      --red:       #EF4444;
+      --red-light: #FEE2E2;
+      --blue:      #3B82F6;
+      --blue-light:#EFF6FF;
+      --bg:        #F0F2F5;
+      --bg-white:  #FFFFFF;
+      --text:      #1C2B33;
+      --text-muted:#5A7080;
+      --border:    #DDE3E8;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+      --radius:    10px;
+      --radius-sm: 6px;
+      --sidebar-w: 248px;
+      --topbar-h:  60px;
+      --font-head: 'Plus Jakarta Sans', 'Segoe UI', Ubuntu, 'Liberation Sans', sans-serif;
+      --font-body: 'Segoe UI', Ubuntu, 'Liberation Sans', sans-serif;
+    }
+
+    /* === RESET === */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      font-family: var(--font-body); color: var(--text);
+      background: var(--bg); line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    h1,h2,h3,h4 { font-family: var(--font-head); line-height: 1.25; }
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+    button { cursor: pointer; font-family: inherit; }
+    input, select { font-family: inherit; }
+
+    /* === LAYOUT SHELL === */
+    .shell { display: flex; min-height: 100vh; }
+
+    /* === SIDEBAR === */
+    .sidebar {
+      width: var(--sidebar-w); min-height: 100vh;
+      background: var(--green-900);
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; bottom: 0; z-index: 50;
+      transition: transform 0.3s ease;
+    }
+    .sidebar-header {
+      padding: 1.25rem 1.25rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .sidebar-logo {
+      display: flex; align-items: center; gap: 0.6rem;
+      font-family: var(--font-head); font-weight: 800; font-size: 1.05rem;
+      color: #fff;
+    }
+    .sidebar-logo .logo-icon {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: var(--green-700); display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .sidebar-logo .logo-icon svg { color: var(--amber); width: 18px; height: 18px; }
+    .sidebar-logo span.accent { color: var(--amber); }
+    .sidebar-school {
+      margin-top: 0.75rem; padding: 0.75rem;
+      background: rgba(255,255,255,0.07); border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+    }
+    .sidebar-school strong { display: block; color: #fff; font-weight: 600; font-size: 0.88rem; }
+    .sidebar-school span { color: rgba(255,255,255,0.5); font-size: 0.75rem; }
+
+    .sidebar-nav { flex: 1; padding: 1rem 0.75rem; overflow-y: auto; }
+    .nav-section-label {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: rgba(255,255,255,0.3);
+      padding: 0.5rem 0.6rem; margin-top: 0.75rem; margin-bottom: 0.25rem;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.65rem 0.85rem; border-radius: var(--radius-sm);
+      font-size: 0.88rem; font-weight: 500; color: rgba(255,255,255,0.65);
+      cursor: pointer; transition: all 0.15s; position: relative;
+    }
+    .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; }
+    .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .nav-item.active {
+      background: rgba(245,166,35,0.18); color: var(--amber);
+      font-weight: 600;
+    }
+    .nav-item.active svg { color: var(--amber); }
+    .nav-badge {
+      margin-left: auto; font-size: 0.68rem; font-weight: 700;
+      background: var(--red); color: #fff;
+      padding: 0.1rem 0.45rem; border-radius: 99px; min-width: 18px; text-align: center;
+    }
+    .nav-badge.amber { background: var(--amber); color: var(--green-900); }
+
+    .sidebar-footer {
+      padding: 1rem 0.75rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .sidebar-user {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem; background: rgba(255,255,255,0.06);
+      border-radius: var(--radius-sm); cursor: pointer;
+      transition: background 0.15s;
+    }
+    .sidebar-user:hover { background: rgba(255,255,255,0.1); }
+    .user-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--green-700); display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-family: var(--font-head); font-weight: 700; color: #fff; font-size: 0.85rem;
+    }
+    .user-info strong { display: block; font-family: var(--font-head); color: #fff; font-size: 0.85rem; font-weight: 600; }
+    .user-info span { font-size: 0.73rem; color: rgba(255,255,255,0.45); }
+    .logout-btn {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.65rem 0.85rem; margin-top: 0.5rem;
+      border-radius: var(--radius-sm); font-size: 0.85rem;
+      color: rgba(255,255,255,0.45); background: none; border: none;
+      width: 100%; transition: color 0.15s, background 0.15s;
+    }
+    .logout-btn svg { width: 16px; height: 16px; }
+    .logout-btn:hover { color: #EF4444; background: rgba(239,68,68,0.1); }
+
+    /* === MAIN CONTENT === */
+    .main-content {
+      margin-left: var(--sidebar-w); flex: 1;
+      display: flex; flex-direction: column; min-height: 100vh;
+    }
+
+    /* === TOPBAR === */
+    .topbar {
+      position: sticky; top: 0; z-index: 40;
+      height: var(--topbar-h); background: var(--bg-white);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.75rem; box-shadow: var(--shadow-sm);
+    }
+    .topbar-left { display: flex; align-items: center; gap: 1rem; }
+    .topbar-left h2 { font-size: 1.05rem; font-weight: 700; }
+    .topbar-left .breadcrumb {
+      font-size: 0.78rem; color: var(--text-muted);
+      display: flex; align-items: center; gap: 0.35rem;
+    }
+    .topbar-left .breadcrumb svg { width: 12px; height: 12px; }
+
+    .topbar-right { display: flex; align-items: center; gap: 0.75rem; }
+    .sync-badge {
+      display: flex; align-items: center; gap: 0.45rem;
+      font-size: 0.78rem; font-weight: 600; padding: 0.3rem 0.75rem;
+      border-radius: 99px; transition: all 0.4s;
+    }
+    .sync-badge.synced { background: var(--green-100); color: var(--green-800); }
+    .sync-badge.offline { background: var(--red-light); color: #B91C1C; }
+    .sync-badge .dot {
+      width: 7px; height: 7px; border-radius: 50%; animation: pulse 2s infinite;
+    }
+    .sync-badge.synced .dot { background: var(--green-600); }
+    .sync-badge.offline .dot { background: var(--red); animation: none; }
+    @keyframes pulse {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .topbar-icon-btn {
+      width: 36px; height: 36px; border-radius: var(--radius-sm);
+      background: none; border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted); transition: all 0.15s; position: relative;
+    }
+    .topbar-icon-btn svg { width: 17px; height: 17px; }
+    .topbar-icon-btn:hover { background: var(--bg); color: var(--text); }
+    .notif-count {
+      position: absolute; top: -4px; right: -4px;
+      background: var(--red); color: #fff; font-size: 0.6rem;
+      font-weight: 700; width: 16px; height: 16px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .topbar-user-btn {
+      display: flex; align-items: center; gap: 0.6rem;
+      background: none; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 0.3rem 0.75rem 0.3rem 0.4rem;
+      font-size: 0.82rem; font-weight: 600; color: var(--text);
+      transition: all 0.15s;
+    }
+    .topbar-user-btn:hover { background: var(--bg); }
+    .topbar-user-btn .tu-avatar {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--green-800); color: #fff;
+      font-size: 0.72rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* === PAGE CONTENT === */
+    .page { padding: 1.75rem; flex: 1; display: none; }
+    .page.active { display: block; }
+
+    /* === PAGE HEADER === */
+    .page-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem;
+    }
+    .page-header h1 { font-size: 1.45rem; font-weight: 800; margin-bottom: 0.2rem; }
+    .page-header p { font-size: 0.88rem; color: var(--text-muted); }
+    .page-header-actions { display: flex; gap: 0.75rem; align-items: center; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: var(--font-head); font-weight: 600;
+      border: none; border-radius: var(--radius-sm);
+      padding: 0.5rem 1.1rem; font-size: 0.85rem;
+      transition: all 0.15s; cursor: pointer;
+    }
+    .btn svg { width: 15px; height: 15px; }
+    .btn-primary { background: var(--green-800); color: #fff; }
+    .btn-primary:hover { background: var(--green-700); }
+    .btn-outline {
+      background: var(--bg-white); color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { background: var(--bg); }
+    .btn-amber { background: var(--amber); color: var(--green-900); }
+    .btn-amber:hover { background: var(--amber-dark); color: #fff; }
+    .btn-danger { background: var(--red-light); color: #B91C1C; border: none; }
+    .btn-danger:hover { background: #FCA5A5; }
+
+    /* === SUMMARY CARDS === */
+    .summary-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem;
+      margin-bottom: 1.75rem;
+    }
+    .summary-card {
+      background: var(--bg-white); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem;
+      box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+    }
+    .summary-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .sc-green::before { background: linear-gradient(90deg, var(--green-800), var(--green-600)); }
+    .sc-blue::before  { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+    .sc-red::before   { background: linear-gradient(90deg, #EF4444, #F87171); }
+    .sc-amber::before { background: linear-gradient(90deg, var(--amber), #FBD28F); }
+    .sc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+    .sc-icon {
+      width: 42px; height: 42px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sc-icon svg { width: 20px; height: 20px; }
+    .sci-green { background: var(--green-100); }
+    .sci-green svg { color: var(--green-800); }
+    .sci-blue { background: var(--blue-light); }
+    .sci-blue svg { color: var(--blue); }
+    .sci-red { background: var(--red-light); }
+    .sci-red svg { color: var(--red); }
+    .sci-amber { background: var(--amber-light); }
+    .sci-amber svg { color: var(--amber-dark); }
+    .sc-trend {
+      font-size: 0.72rem; font-weight: 600; padding: 0.15rem 0.5rem;
+      border-radius: 99px;
+    }
+    .trend-up   { background: var(--green-100); color: var(--green-800); }
+    .trend-down { background: var(--red-light); color: #B91C1C; }
+    .trend-neutral { background: var(--bg); color: var(--text-muted); }
+    .sc-value { font-family: var(--font-head); font-size: 2rem; font-weight: 800; line-height: 1; margin-bottom: 0.25rem; }
+    .sc-label { font-size: 0.82rem; color: var(--text-muted); font-weight: 500; }
+
+    /* === PANEL === */
+    .panel {
+      background: var(--bg-white); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--border);
+    }
+    .panel-title {
+      font-family: var(--font-head); font-size: 0.95rem; font-weight: 700;
+    }
+    .panel-actions { display: flex; gap: 0.6rem; align-items: center; }
+    .panel-body { padding: 0; }
+
+    /* === GRID LAYOUTS === */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+
+    /* === TABLE === */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th {
+      text-align: left; font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--text-muted); padding: 0.85rem 1.5rem;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+    }
+    .data-table td {
+      padding: 0.95rem 1.5rem; font-size: 0.875rem;
+      border-bottom: 1px solid var(--border); vertical-align: middle;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: var(--bg); }
+
+    /* === STATUS PILLS === */
+    .pill {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+      text-transform: uppercase; padding: 0.2rem 0.65rem; border-radius: 99px;
+    }
+    .pill::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+    .pill-online  { background: var(--green-100); color: var(--green-800); }
+    .pill-online::before { background: var(--green-600); }
+    .pill-offline { background: var(--red-light); color: #B91C1C; }
+    .pill-offline::before { background: var(--red); }
+    .pill-syncing { background: var(--blue-light); color: #1D6FB8; }
+    .pill-syncing::before { background: var(--blue); }
+    .pill-warning { background: var(--amber-light); color: var(--amber-dark); }
+    .pill-warning::before { background: var(--amber); }
+    .pill-compliant  { background: var(--green-100); color: var(--green-800); }
+    .pill-compliant::before { background: var(--green-600); }
+    .pill-violation  { background: var(--red-light); color: #B91C1C; }
+    .pill-violation::before { background: var(--red); }
+
+    /* === DEVICE TABLE EXTRAS === */
+    .device-name { font-weight: 600; color: var(--text); display: block; }
+    .device-id   { font-size: 0.72rem; color: var(--text-muted); font-family: monospace; }
+    .battery-bar {
+      width: 60px; height: 8px; background: var(--border);
+      border-radius: 99px; overflow: hidden; display: inline-block;
+      vertical-align: middle; margin-right: 0.4rem;
+    }
+    .battery-bar .fill { height: 100%; border-radius: 99px; }
+    .bat-high .fill  { background: var(--green-600); }
+    .bat-mid .fill   { background: var(--amber); }
+    .bat-low .fill   { background: var(--red); }
+    .action-btn {
+      background: none; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 0.3rem 0.65rem;
+      font-size: 0.75rem; font-weight: 600; color: var(--text-muted);
+      cursor: pointer; transition: all 0.15s;
+    }
+    .action-btn:hover { border-color: var(--green-800); color: var(--green-800); background: var(--green-50); }
+
+    /* === SEARCH/FILTER BAR === */
+    .filter-bar {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 1rem 1.5rem; border-bottom: 1px solid var(--border);
+      background: var(--bg); flex-wrap: wrap;
+    }
+    .search-input-wrap { position: relative; flex: 1; min-width: 200px; }
+    .search-input-wrap svg {
+      position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); width: 15px; height: 15px; pointer-events: none;
+    }
+    .search-input {
+      width: 100%; padding: 0.55rem 0.85rem 0.55rem 2.2rem;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 0.85rem; background: var(--bg-white); color: var(--text);
+      outline: none; transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--green-800); }
+    .filter-select {
+      padding: 0.55rem 0.85rem; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); font-size: 0.82rem;
+      background: var(--bg-white); color: var(--text); outline: none; cursor: pointer;
+    }
+
+    /* === AUDIT LOG === */
+    .audit-list { padding: 0; }
+    .audit-item {
+      display: flex; gap: 1rem; align-items: flex-start;
+      padding: 1rem 1.5rem; border-bottom: 1px solid var(--border);
+      font-size: 0.85rem; transition: background 0.15s;
+    }
+    .audit-item:hover { background: var(--bg); }
+    .audit-item:last-child { border-bottom: none; }
+    .audit-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.1rem;
+    }
+    .audit-icon svg { width: 15px; height: 15px; }
+    .ai-green  { background: var(--green-100); }
+    .ai-green svg { color: var(--green-800); }
+    .ai-red    { background: var(--red-light); }
+    .ai-red svg { color: var(--red); }
+    .ai-amber  { background: var(--amber-light); }
+    .ai-amber svg { color: var(--amber-dark); }
+    .ai-blue   { background: var(--blue-light); }
+    .ai-blue svg { color: var(--blue); }
+    .audit-body { flex: 1; }
+    .audit-body strong { font-weight: 600; color: var(--text); display: block; margin-bottom: 0.15rem; }
+    .audit-body span { color: var(--text-muted); font-size: 0.8rem; }
+    .audit-hash {
+      font-family: monospace; font-size: 0.7rem; color: var(--text-muted);
+      background: var(--bg); padding: 0.15rem 0.45rem; border-radius: 4px;
+      display: inline-block; margin-top: 0.3rem; letter-spacing: 0.05em;
+    }
+    .audit-time { font-size: 0.73rem; color: var(--text-muted); white-space: nowrap; margin-top: 0.15rem; }
+
+    /* === MINI CHART (CSS bar chart) === */
+    .mini-chart { padding: 1.25rem 1.5rem; }
+    .chart-row {
+      display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;
+      font-size: 0.82rem;
+    }
+    .chart-label { width: 100px; color: var(--text-muted); flex-shrink: 0; }
+    .chart-bar-wrap { flex: 1; height: 10px; background: var(--bg); border-radius: 99px; overflow: hidden; }
+    .chart-bar { height: 100%; border-radius: 99px; transition: width 0.8s ease; }
+    .cb-green { background: linear-gradient(90deg, var(--green-800), var(--green-600)); }
+    .cb-amber { background: linear-gradient(90deg, var(--amber-dark), var(--amber)); }
+    .cb-red   { background: linear-gradient(90deg, #DC2626, #EF4444); }
+    .cb-blue  { background: linear-gradient(90deg, #1D6FB8, var(--blue)); }
+    .chart-val { width: 36px; text-align: right; font-weight: 600; font-size: 0.82rem; }
+
+    /* === POLICY CARDS === */
+    .policy-grid { padding: 1.25rem; display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; }
+    .policy-card {
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 1.25rem; transition: all 0.15s;
+    }
+    .policy-card:hover { border-color: var(--green-800); box-shadow: var(--shadow-sm); }
+    .pc-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.75rem; }
+    .pc-icon {
+      width: 38px; height: 38px; border-radius: 8px;
+      background: var(--green-100); display: flex; align-items: center; justify-content: center;
+    }
+    .pc-icon svg { color: var(--green-800); width: 18px; height: 18px; }
+    .policy-card h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.35rem; }
+    .policy-card p { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem; }
+    .pc-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .pc-tag {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 0.15rem 0.5rem; border-radius: 99px;
+      background: var(--green-100); color: var(--green-800);
+    }
+    .pc-tag.amber { background: var(--amber-light); color: var(--amber-dark); }
+
+    /* === COMPLIANCE PROGRESS === */
+    .compliance-ring {
+      display: flex; flex-direction: column; align-items: center; padding: 2rem;
+    }
+    .ring-svg { width: 120px; height: 120px; }
+    .ring-bg   { fill: none; stroke: var(--border); stroke-width: 8; }
+    .ring-fill { fill: none; stroke: var(--green-600); stroke-width: 8; stroke-linecap: round;
+                 stroke-dasharray: 339.29; stroke-dashoffset: 33.93; transform: rotate(-90deg); transform-origin: 50% 50%;
+                 transition: stroke-dashoffset 1.2s ease; }
+    .ring-text { text-anchor: middle; font-family: var(--font-head); }
+    .compliance-label { margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted); }
+    .compliance-val { font-family: var(--font-head); font-size: 1.25rem; font-weight: 800; color: var(--green-800); }
+
+    /* === VIOLATION ALERTS === */
+    .alert-list { display: flex; flex-direction: column; gap: 0; }
+    .alert-item {
+      display: flex; gap: 1rem; align-items: center;
+      padding: 0.9rem 1.5rem; border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .alert-item:last-child { border-bottom: none; }
+    .alert-severity {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 4px;
+      white-space: nowrap;
+    }
+    .sev-high   { background: var(--red-light); color: #B91C1C; }
+    .sev-medium { background: var(--amber-light); color: var(--amber-dark); }
+    .sev-low    { background: var(--blue-light); color: #1D6FB8; }
+    .alert-item .al-device { font-weight: 600; min-width: 90px; }
+    .alert-item .al-desc { flex: 1; color: var(--text-muted); }
+    .alert-item .al-time { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
+
+    /* === NOTIFICATION PANEL === */
+    .notif-panel {
+      position: fixed; top: calc(var(--topbar-h) + 0.5rem); right: 1.5rem; z-index: 200;
+      width: 340px; background: var(--bg-white); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow-lg);
+      display: none;
+    }
+    .notif-panel.open { display: block; }
+    .notif-panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.25rem; border-bottom: 1px solid var(--border);
+    }
+    .notif-panel-header h4 { font-family: var(--font-head); font-size: 0.9rem; font-weight: 700; }
+    .notif-panel-header button {
+      background: none; border: none; color: var(--text-muted);
+      font-size: 0.78rem; font-weight: 600; cursor: pointer;
+    }
+    .notif-item {
+      display: flex; gap: 0.75rem; padding: 0.9rem 1.25rem;
+      border-bottom: 1px solid var(--border); font-size: 0.83rem;
+    }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 0.35rem; }
+    .notif-body strong { display: block; font-weight: 600; margin-bottom: 0.15rem; }
+    .notif-body span { color: var(--text-muted); font-size: 0.78rem; }
+
+    /* === MOBILE SIDEBAR TOGGLE === */
+    .sidebar-toggle {
+      display: none; background: none; border: none;
+      width: 36px; height: 36px; align-items: center; justify-content: center;
+      color: var(--text-muted); cursor: pointer;
+    }
+    .sidebar-toggle svg { width: 20px; height: 20px; }
+
+    /* === TOAST === */
+    .toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 300;
+      background: var(--green-900); color: #fff;
+      border-radius: var(--radius-sm); padding: 0.85rem 1.25rem;
+      font-size: 0.88rem; font-weight: 500;
+      display: flex; align-items: center; gap: 0.6rem;
+      box-shadow: var(--shadow-lg); transform: translateY(20px); opacity: 0;
+      transition: all 0.3s; pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+    .toast svg { color: var(--amber); width: 16px; height: 16px; flex-shrink: 0; }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 1100px) {
+      .summary-grid { grid-template-columns: repeat(2,1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr; }
+      .policy-grid { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; }
+      .sidebar-toggle { display: flex; }
+      .summary-grid { grid-template-columns: repeat(2,1fr); }
+      .policy-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .summary-grid { grid-template-columns: 1fr; }
+      .topbar { padding: 0 1rem; }
+      .page { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- === SIDEBAR === -->
+  <aside class="sidebar" id="sidebar" aria-label="Sidebar navigation">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <span><span class="accent">EduGuard</span> MDM</span>
+      </div>
+      <div class="sidebar-school" aria-label="Current school">
+        <strong id="schoolNameDisplay">Kampala Sec. School</strong>
+        <span>ICT Administrator</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Dashboard navigation">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active" data-page="dashboard" role="button" tabindex="0" aria-current="page">
+        <svg data-lucide="layout-dashboard" aria-hidden="true"></svg> Dashboard
+      </div>
+
+      <div class="nav-section-label">Device Management</div>
+      <div class="nav-item" data-page="devices" role="button" tabindex="0">
+        <svg data-lucide="smartphone" aria-hidden="true"></svg> Devices
+        <span class="nav-badge amber" aria-label="3 pending devices">3</span>
+      </div>
+      <div class="nav-item" data-page="policies" role="button" tabindex="0">
+        <svg data-lucide="shield" aria-hidden="true"></svg> Policies
+      </div>
+      <div class="nav-item" data-page="apps" role="button" tabindex="0">
+        <svg data-lucide="app-window" aria-hidden="true"></svg> Applications
+      </div>
+
+      <div class="nav-section-label">Security &amp; Forensics</div>
+      <div class="nav-item" data-page="auditlog" role="button" tabindex="0">
+        <svg data-lucide="file-search" aria-hidden="true"></svg> Audit Log
+        <span class="nav-badge" aria-label="2 new alerts">2</span>
+      </div>
+      <div class="nav-item" data-page="violations" role="button" tabindex="0">
+        <svg data-lucide="alert-triangle" aria-hidden="true"></svg> Violations
+      </div>
+
+      <div class="nav-section-label">Reporting</div>
+      <div class="nav-item" data-page="reports" role="button" tabindex="0">
+        <svg data-lucide="bar-chart-2" aria-hidden="true"></svg> Reports
+      </div>
+      <div class="nav-item" data-page="settings" role="button" tabindex="0">
+        <svg data-lucide="settings" aria-hidden="true"></svg> Settings
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user" role="button" tabindex="0" aria-label="User profile">
+        <div class="user-avatar" aria-hidden="true">AO</div>
+        <div class="user-info">
+          <strong>Admin Ouma</strong>
+          <span>Super Admin</span>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="window.location.href='index.html'" aria-label="Logout and return to landing page">
+        <svg data-lucide="log-out" aria-hidden="true"></svg>
+        Back to Website
+      </button>
+    </div>
+  </aside>
+
+  <!-- === MAIN CONTENT === -->
+  <div class="main-content">
+    <!-- === TOPBAR === -->
+    <header class="topbar" role="banner">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+          <svg data-lucide="menu" aria-hidden="true"></svg>
+        </button>
+        <div>
+          <h2 id="pageTitle">Dashboard</h2>
+          <div class="breadcrumb" aria-label="Breadcrumb">
+            EduGuard MDM <svg data-lucide="chevron-right" aria-hidden="true"></svg>
+            <span id="breadcrumbCurrent">Overview</span>
+          </div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="sync-badge synced" id="syncBadge" role="status" aria-live="polite" aria-label="Sync status">
+          <div class="dot" aria-hidden="true"></div>
+          <span id="syncText">Synced</span>
+        </div>
+        <button class="topbar-icon-btn" id="notifBtn" aria-label="Notifications (2 unread)" aria-haspopup="true" aria-expanded="false">
+          <svg data-lucide="bell" aria-hidden="true"></svg>
+          <span class="notif-count" aria-hidden="true">2</span>
+        </button>
+        <button class="topbar-icon-btn" aria-label="Refresh dashboard" onclick="showToast('Dashboard refreshed')">
+          <svg data-lucide="refresh-cw" aria-hidden="true"></svg>
+        </button>
+        <button class="topbar-user-btn" aria-label="User menu">
+          <div class="tu-avatar" aria-hidden="true">AO</div>
+          Admin Ouma
+        </button>
+      </div>
+    </header>
+
+    <!-- === NOTIFICATION PANEL === -->
+    <div class="notif-panel" id="notifPanel" role="dialog" aria-modal="true" aria-label="Notifications">
+      <div class="notif-panel-header">
+        <h4>Notifications</h4>
+        <button onclick="document.getElementById('notifPanel').classList.remove('open')">Mark all read</button>
+      </div>
+      <div class="notif-item">
+        <div class="notif-dot" style="background:var(--red)" aria-hidden="true"></div>
+        <div class="notif-body">
+          <strong>Policy Violation Detected</strong>
+          <span>Tablet TBL-014 attempted to launch a blocked app during exam session. 09:47 AM</span>
+        </div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-dot" style="background:var(--amber)" aria-hidden="true"></div>
+        <div class="notif-body">
+          <strong>3 Devices Pending Sync</strong>
+          <span>TBL-007, TBL-019, TBL-023 have not synced in over 24 hours. Check connectivity.</span>
+        </div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-dot" style="background:var(--green-600)" aria-hidden="true"></div>
+        <div class="notif-body">
+          <strong>Enrollment Complete</strong>
+          <span>5 new devices successfully enrolled via QR code. S.3 Science Lab. Yesterday.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================= -->
+    <!-- PAGE: DASHBOARD               -->
+    <!-- ============================= -->
+    <main class="page active" id="page-dashboard" aria-labelledby="dashTitle">
+      <div class="page-header">
+        <div>
+          <h1 id="dashTitle">Overview</h1>
+          <p>Welcome back, Admin Ouma. Here's your school's device status at a glance.</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-outline" onclick="showToast('Exporting report...')">
+            <svg data-lucide="download" aria-hidden="true"></svg> Export Report
+          </button>
+          <button class="btn btn-primary" onclick="navigate('devices')">
+            <svg data-lucide="plus" aria-hidden="true"></svg> Enroll Device
+          </button>
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="summary-grid" role="list" aria-label="Summary statistics">
+        <div class="summary-card sc-green" role="listitem">
+          <div class="sc-header">
+            <div class="sc-icon sci-green" aria-hidden="true"><svg data-lucide="smartphone"></svg></div>
+            <span class="sc-trend trend-up" aria-label="Up 5 from last week">+5 this week</span>
+          </div>
+          <div class="sc-value" aria-label="47">47</div>
+          <div class="sc-label">Total Enrolled Devices</div>
+        </div>
+        <div class="summary-card sc-blue" role="listitem">
+          <div class="sc-header">
+            <div class="sc-icon sci-blue" aria-hidden="true"><svg data-lucide="wifi"></svg></div>
+            <span class="sc-trend trend-neutral" aria-label="Real time">Real-time</span>
+          </div>
+          <div class="sc-value" id="onlineCount" aria-label="32">32</div>
+          <div class="sc-label">Online Now</div>
+        </div>
+        <div class="summary-card sc-red" role="listitem">
+          <div class="sc-header">
+            <div class="sc-icon sci-red" aria-hidden="true"><svg data-lucide="alert-triangle"></svg></div>
+            <span class="sc-trend trend-down" aria-label="2 new today">2 new today</span>
+          </div>
+          <div class="sc-value" aria-label="4">4</div>
+          <div class="sc-label">Policy Violations</div>
+        </div>
+        <div class="summary-card sc-amber" role="listitem">
+          <div class="sc-header">
+            <div class="sc-icon sci-amber" aria-hidden="true"><svg data-lucide="clock"></svg></div>
+            <span class="sc-trend trend-neutral" aria-label="Awaiting sync">Awaiting sync</span>
+          </div>
+          <div class="sc-value" aria-label="3">3</div>
+          <div class="sc-label">Pending Syncs</div>
+        </div>
+      </div>
+
+      <!-- Main Panels Row -->
+      <div class="grid-3" style="margin-bottom:1.5rem;">
+        <!-- Device Compliance Chart -->
+        <div class="panel" aria-label="Device compliance chart">
+          <div class="panel-header">
+            <span class="panel-title">Compliance by Class</span>
+            <div class="panel-actions">
+              <button class="btn btn-outline" style="font-size:0.78rem;padding:0.3rem 0.75rem;" onclick="showToast('Viewing full report...')">Full Report</button>
+            </div>
+          </div>
+          <div class="mini-chart" aria-label="Compliance percentages by class">
+            <div class="chart-row">
+              <span class="chart-label">S.1 Blue</span>
+              <div class="chart-bar-wrap"><div class="chart-bar cb-green" style="width:94%"></div></div>
+              <span class="chart-val">94%</span>
+            </div>
+            <div class="chart-row">
+              <span class="chart-label">S.2 Green</span>
+              <div class="chart-bar-wrap"><div class="chart-bar cb-green" style="width:88%"></div></div>
+              <span class="chart-val">88%</span>
+            </div>
+            <div class="chart-row">
+              <span class="chart-label">S.3 Science</span>
+              <div class="chart-bar-wrap"><div class="chart-bar cb-amber" style="width:72%"></div></div>
+              <span class="chart-val">72%</span>
+            </div>
+            <div class="chart-row">
+              <span class="chart-label">S.4 Arts</span>
+              <div class="chart-bar-wrap"><div class="chart-bar cb-green" style="width:91%"></div></div>
+              <span class="chart-val">91%</span>
+            </div>
+            <div class="chart-row">
+              <span class="chart-label">S.5 PCM</span>
+              <div class="chart-bar-wrap"><div class="chart-bar cb-red" style="width:61%"></div></div>
+              <span class="chart-val">61%</span>
+            </div>
+            <div class="chart-row">
+              <span class="chart-label">S.6 Arts</span>
+              <div class="chart-bar-wrap"><div class="chart-bar cb-green" style="width:97%"></div></div>
+              <span class="chart-val">97%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compliance Ring + Active Violations -->
+        <div style="display:flex;flex-direction:column;gap:1.5rem;">
+          <div class="panel" aria-label="Overall compliance rate">
+            <div class="panel-header"><span class="panel-title">Overall Compliance</span></div>
+            <div class="compliance-ring">
+              <svg class="ring-svg" viewBox="0 0 120 120" aria-label="84% compliance rate">
+                <circle class="ring-bg" cx="60" cy="60" r="54"/>
+                <circle class="ring-fill" cx="60" cy="60" r="54"/>
+                <text class="ring-text" x="60" y="56" font-size="20" font-weight="800" fill="var(--green-800)">84%</text>
+                <text class="ring-text" x="60" y="72" font-size="10" fill="var(--text-muted)">Compliant</text>
+              </svg>
+              <div class="compliance-label">Across 47 enrolled devices</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Violations + Audit Log Row -->
+      <div class="grid-2">
+        <div class="panel" aria-label="Recent policy violations">
+          <div class="panel-header">
+            <span class="panel-title">Recent Violations</span>
+            <button class="btn btn-outline" style="font-size:0.78rem;padding:0.3rem 0.75rem;" onclick="navigate('violations')">View All</button>
+          </div>
+          <div class="alert-list" role="list" aria-label="Violation alerts">
+            <div class="alert-item" role="listitem">
+              <span class="alert-severity sev-high" aria-label="High severity">HIGH</span>
+              <span class="al-device">TBL-014</span>
+              <span class="al-desc">Blocked app launch (WhatsApp) during Math S.3</span>
+              <span class="al-time">09:47 AM</span>
+            </div>
+            <div class="alert-item" role="listitem">
+              <span class="alert-severity sev-medium" aria-label="Medium severity">MED</span>
+              <span class="al-device">TBL-007</span>
+              <span class="al-desc">Attempted screen capture during exam session</span>
+              <span class="al-time">Yesterday</span>
+            </div>
+            <div class="alert-item" role="listitem">
+              <span class="alert-severity sev-medium" aria-label="Medium severity">MED</span>
+              <span class="al-device">TBL-031</span>
+              <span class="al-desc">Policy not applied — sync overdue 36h</span>
+              <span class="al-time">Yesterday</span>
+            </div>
+            <div class="alert-item" role="listitem">
+              <span class="alert-severity sev-low" aria-label="Low severity">LOW</span>
+              <span class="al-device">TBL-002</span>
+              <span class="al-desc">Brightness override attempted outside kiosk</span>
+              <span class="al-time">Mon</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" aria-label="Recent audit log entries">
+          <div class="panel-header">
+            <span class="panel-title">Audit Log — Recent Entries</span>
+            <button class="btn btn-outline" style="font-size:0.78rem;padding:0.3rem 0.75rem;" onclick="navigate('auditlog')">Full Log</button>
+          </div>
+          <div class="audit-list" role="log" aria-live="polite" aria-label="Audit log">
+            <div class="audit-item">
+              <div class="audit-icon ai-green" aria-hidden="true"><svg data-lucide="check-circle"></svg></div>
+              <div class="audit-body">
+                <strong>Policy bundle applied — TBL-014</strong>
+                <span>Exam Mode v2.3 activated. Session: S.3 Chemistry UNEB Mock</span>
+                <div class="audit-hash" aria-label="Hash: a3f9c1d">a3f9c1d…</div>
+              </div>
+              <div class="audit-time">09:30 AM</div>
+            </div>
+            <div class="audit-item">
+              <div class="audit-icon ai-red" aria-hidden="true"><svg data-lucide="alert-circle"></svg></div>
+              <div class="audit-body">
+                <strong>Violation — Blocked App Attempt</strong>
+                <span>TBL-014: com.whatsapp blocked. Policy hash verified. Event logged.</span>
+                <div class="audit-hash" aria-label="Hash: b72d8fa">b72d8fa…</div>
+              </div>
+              <div class="audit-time">09:47 AM</div>
+            </div>
+            <div class="audit-item">
+              <div class="audit-icon ai-blue" aria-hidden="true"><svg data-lucide="user-plus"></svg></div>
+              <div class="audit-body">
+                <strong>Device Enrollment — QR Code</strong>
+                <span>TBL-047 enrolled. Serial: TECNO-A7-UG-4471. Class: S.5 PCM</span>
+                <div class="audit-hash" aria-label="Hash: c18e03b">c18e03b…</div>
+              </div>
+              <div class="audit-time">08:15 AM</div>
+            </div>
+            <div class="audit-item">
+              <div class="audit-icon ai-amber" aria-hidden="true"><svg data-lucide="refresh-cw"></svg></div>
+              <div class="audit-body">
+                <strong>Offline Sync — Batch of 12 devices</strong>
+                <span>Sync via local Wi-Fi. 12/12 devices updated. Signatures valid.</span>
+                <div class="audit-hash" aria-label="Hash: e99f21c">e99f21c…</div>
+              </div>
+              <div class="audit-time">07:58 AM</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ============================= -->
+    <!-- PAGE: DEVICES                 -->
+    <!-- ============================= -->
+    <main class="page" id="page-devices" aria-labelledby="devicesTitle">
+      <div class="page-header">
+        <div>
+          <h1 id="devicesTitle">Enrolled Devices</h1>
+          <p>47 devices enrolled across 6 class groups. 3 pending sync.</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-outline" onclick="showToast('Generating QR enrollment code...')">
+            <svg data-lucide="qr-code" aria-hidden="true"></svg> QR Enroll
+          </button>
+          <button class="btn btn-primary" onclick="showToast('Export started...')">
+            <svg data-lucide="download" aria-hidden="true"></svg> Export CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="filter-bar" role="search" aria-label="Device search and filters">
+          <div class="search-input-wrap">
+            <svg data-lucide="search" aria-hidden="true"></svg>
+            <input type="search" class="search-input" id="deviceSearch" placeholder="Search device name, serial, or class…" aria-label="Search devices" oninput="filterDevices(this.value)" />
+          </div>
+          <select class="filter-select" aria-label="Filter by class" onchange="showToast('Filter applied')">
+            <option value="">All Classes</option>
+            <option>S.1 Blue</option>
+            <option>S.2 Green</option>
+            <option>S.3 Science</option>
+            <option>S.4 Arts</option>
+            <option>S.5 PCM</option>
+            <option>S.6 Arts</option>
+          </select>
+          <select class="filter-select" aria-label="Filter by status" onchange="showToast('Filter applied')">
+            <option value="">All Statuses</option>
+            <option>Online</option>
+            <option>Offline</option>
+            <option>Syncing</option>
+          </select>
+          <select class="filter-select" aria-label="Filter by compliance" onchange="showToast('Filter applied')">
+            <option value="">Compliance</option>
+            <option>Compliant</option>
+            <option>Violation</option>
+          </select>
+        </div>
+
+        <div class="panel-body">
+          <table class="data-table" aria-label="Device management table">
+            <thead>
+              <tr>
+                <th scope="col">Device</th>
+                <th scope="col">Class Group</th>
+                <th scope="col">Status</th>
+                <th scope="col">Compliance</th>
+                <th scope="col">Battery</th>
+                <th scope="col">Last Sync</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="devicesTableBody">
+              <tr>
+                <td><span class="device-name">Tecno Spark 10</span><span class="device-id">TBL-001 · TECNO-A7-4401</span></td>
+                <td>S.1 Blue</td>
+                <td><span class="pill pill-online">Online</span></td>
+                <td><span class="pill pill-compliant">Compliant</span></td>
+                <td><div class="battery-bar bat-high" aria-label="Battery 87%"><div class="fill" style="width:87%"></div></div>87%</td>
+                <td>2 min ago</td>
+                <td><button class="action-btn" onclick="showToast('Viewing TBL-001...')">View</button> <button class="action-btn" onclick="showToast('Policy pushed to TBL-001')">Push Policy</button></td>
+              </tr>
+              <tr>
+                <td><span class="device-name">Itel A70</span><span class="device-id">TBL-002 · ITEL-A70-4802</span></td>
+                <td>S.1 Blue</td>
+                <td><span class="pill pill-online">Online</span></td>
+                <td><span class="pill pill-violation">Violation</span></td>
+                <td><div class="battery-bar bat-mid" aria-label="Battery 43%"><div class="fill" style="width:43%"></div></div>43%</td>
+                <td>5 min ago</td>
+                <td><button class="action-btn" onclick="showToast('Viewing TBL-002...')">View</button> <button class="action-btn" onclick="showToast('Lock applied to TBL-002')">Lock</button></td>
+              </tr>
+              <tr>
+                <td><span class="device-name">Samsung A05</span><span class="device-id">TBL-007 · SAM-A05-3311</span></td>
+                <td>S.2 Green</td>
+                <td><span class="pill pill-syncing">Syncing</span></td>
+                <td><span class="pill pill-warning">Pending</span></td>
+                <td><div class="battery-bar bat-high" aria-label="Battery 72%"><div class="fill" style="width:72%"></div></div>72%</td>
+                <td>18 min ago</td>
+                <td><button class="action-btn" onclick="showToast('Viewing TBL-007...')">View</button> <button class="action-btn" onclick="showToast('Sync forced for TBL-007')">Force Sync</button></td>
+              </tr>
+              <tr>
+                <td><span class="device-name">Tecno Spark 8</span><span class="device-id">TBL-014 · TECNO-S8-5512</span></td>
+                <td>S.3 Science</td>
+                <td><span class="pill pill-online">Online</span></td>
+                <td><span class="pill pill-violation">Violation</span></td>
+                <td><div class="battery-bar bat-mid" aria-label="Battery 38%"><div class="fill" style="width:38%"></div></div>38%</td>
+                <td>1 min ago</td>
+                <td><button class="action-btn" onclick="showToast('Viewing TBL-014 violation log...')">View Log</button> <button class="action-btn" onclick="showToast('Device locked')">Lock</button></td>
+              </tr>
+              <tr>
+                <td><span class="device-name">Itel P55+</span><span class="device-id">TBL-019 · ITEL-P55-7723</span></td>
+                <td>S.4 Arts</td>
+                <td><span class="pill pill-offline">Offline</span></td>
+                <td><span class="pill pill-warning">Unknown</span></td>
+                <td><div class="battery-bar bat-low" aria-label="Battery 12%"><div class="fill" style="width:12%"></div></div>12%</td>
+                <td>26 hrs ago</td>
+                <td><button class="action-btn" onclick="showToast('Viewing TBL-019...')">View</button> <button class="action-btn" onclick="showToast('Alert sent to teacher')">Alert</button></td>
+              </tr>
+              <tr>
+                <td><span class="device-name">Samsung A14</span><span class="device-id">TBL-031 · SAM-A14-9944</span></td>
+                <td>S.5 PCM</td>
+                <td><span class="pill pill-offline">Offline</span></td>
+                <td><span class="pill pill-violation">Violation</span></td>
+                <td><div class="battery-bar bat-mid" aria-label="Battery 55%"><div class="fill" style="width:55%"></div></div>55%</td>
+                <td>36 hrs ago</td>
+                <td><button class="action-btn" onclick="showToast('Viewing TBL-031...')">View</button> <button class="action-btn" onclick="showToast('Remote wipe scheduled')">Wipe</button></td>
+              </tr>
+              <tr>
+                <td><span class="device-name">Tecno Camon 20</span><span class="device-id">TBL-047 · TECNO-C20-1122</span></td>
+                <td>S.5 PCM</td>
+                <td><span class="pill pill-online">Online</span></td>
+                <td><span class="pill pill-compliant">Compliant</span></td>
+                <td><div class="battery-bar bat-high" aria-label="Battery 91%"><div class="fill" style="width:91%"></div></div>91%</td>
+                <td>Just now</td>
+                <td><button class="action-btn" onclick="showToast('Viewing TBL-047...')">View</button> <button class="action-btn" onclick="showToast('Policy pushed to TBL-047')">Push Policy</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <!-- ============================= -->
+    <!-- PAGE: POLICIES                -->
+    <!-- ============================= -->
+    <main class="page" id="page-policies" aria-labelledby="policiesTitle">
+      <div class="page-header">
+        <div>
+          <h1 id="policiesTitle">Security Policies</h1>
+          <p>6 active policy profiles across all class groups. All cryptographically signed.</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary" onclick="showToast('New policy editor opened...')">
+            <svg data-lucide="plus" aria-hidden="true"></svg> Create Policy
+          </button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Active Policy Profiles</span></div>
+        <div class="policy-grid" role="list" aria-label="Policy profiles">
+          <div class="policy-card" role="listitem">
+            <div class="pc-header">
+              <div class="pc-icon" aria-hidden="true"><svg data-lucide="lock-keyhole"></svg></div>
+              <span class="pill pill-online">Active</span>
+            </div>
+            <h4>Exam Kiosk Mode</h4>
+            <p>Single-app lockdown. Blocks all notifications, multitasking, screenshots, and clipboard access. Applied during UNEB mock sessions.</p>
+            <div class="pc-meta">
+              <span class="pc-tag">S.3 Science</span>
+              <span class="pc-tag amber">AES-256</span>
+            </div>
+          </div>
+          <div class="policy-card" role="listitem">
+            <div class="pc-header">
+              <div class="pc-icon" aria-hidden="true"><svg data-lucide="app-window"></svg></div>
+              <span class="pill pill-online">Active</span>
+            </div>
+            <h4>App Whitelist — STEM</h4>
+            <p>Allows: Khan Academy, GeoGebra, Periodic Table, Calculator. Blocks all social media and entertainment apps during class hours.</p>
+            <div class="pc-meta">
+              <span class="pc-tag">S.1–S.3</span>
+              <span class="pc-tag amber">MAC Policy</span>
+            </div>
+          </div>
+          <div class="policy-card" role="listitem">
+            <div class="pc-header">
+              <div class="pc-icon" aria-hidden="true"><svg data-lucide="globe-2"></svg></div>
+              <span class="pill pill-online">Active</span>
+            </div>
+            <h4>Web Filter — Safe Browsing</h4>
+            <p>Allowlist-only web access. Blocks all non-educational domains. DNS-based filtering enforced at the Android VPN profile level.</p>
+            <div class="pc-meta">
+              <span class="pc-tag">All Classes</span>
+              <span class="pc-tag amber">DNS Filter</span>
+            </div>
+          </div>
+          <div class="policy-card" role="listitem">
+            <div class="pc-header">
+              <div class="pc-icon" aria-hidden="true"><svg data-lucide="clock"></svg></div>
+              <span class="pill pill-syncing">Scheduled</span>
+            </div>
+            <h4>Session Timetable</h4>
+            <p>Policies switch automatically per school timetable. Math policy activates at 08:00, English at 10:00. Verified via signed schedule bundle.</p>
+            <div class="pc-meta">
+              <span class="pc-tag">S.4–S.6</span>
+              <span class="pc-tag amber">Time-Based</span>
+            </div>
+          </div>
+          <div class="policy-card" role="listitem">
+            <div class="pc-header">
+              <div class="pc-icon" aria-hidden="true"><svg data-lucide="battery-low"></svg></div>
+              <span class="pill pill-warning">Draft</span>
+            </div>
+            <h4>Low Battery Protocol</h4>
+            <p>Automatically restricts background processes and dims screen when battery drops below 20% to preserve uptime during long exam sessions.</p>
+            <div class="pc-meta">
+              <span class="pc-tag">All Devices</span>
+            </div>
+          </div>
+          <div class="policy-card" role="listitem">
+            <div class="pc-header">
+              <div class="pc-icon" aria-hidden="true"><svg data-lucide="shield-off"></svg></div>
+              <span class="pill pill-offline">Inactive</span>
+            </div>
+            <h4>Emergency Lockdown</h4>
+            <p>Full device lockdown triggered by admin. Disables all connectivity, apps, and UI. Requires signed unlock token to release. For security incidents.</p>
+            <div class="pc-meta">
+              <span class="pc-tag">Emergency</span>
+              <span class="pc-tag amber">Signed Token</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ============================= -->
+    <!-- PAGE: AUDIT LOG               -->
+    <!-- ============================= -->
+    <main class="page" id="page-auditlog" aria-labelledby="auditTitle">
+      <div class="page-header">
+        <div>
+          <h1 id="auditTitle">Forensic Audit Log</h1>
+          <p>Hash-chained, tamper-evident event log. Every entry is SHA-256 linked to the previous record.</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-outline" onclick="showToast('Exporting audit log as evidence package...')">
+            <svg data-lucide="download" aria-hidden="true"></svg> Export Evidence
+          </button>
+          <button class="btn btn-primary" onclick="showToast('Chain integrity: VERIFIED ✓')">
+            <svg data-lucide="shield-check" aria-hidden="true"></svg> Verify Chain
+          </button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="filter-bar">
+          <div class="search-input-wrap">
+            <svg data-lucide="search" aria-hidden="true"></svg>
+            <input type="search" class="search-input" placeholder="Search events, devices, hashes…" aria-label="Search audit log" />
+          </div>
+          <select class="filter-select" aria-label="Filter by event type">
+            <option>All Events</option>
+            <option>Policy Applied</option>
+            <option>Violation</option>
+            <option>Enrollment</option>
+            <option>Sync</option>
+            <option>Admin Action</option>
+          </select>
+          <select class="filter-select" aria-label="Filter by date">
+            <option>Today</option>
+            <option>Last 7 days</option>
+            <option>Last 30 days</option>
+          </select>
+        </div>
+        <div class="audit-list" role="log" aria-label="Forensic audit log entries" aria-live="polite">
+          <div class="audit-item">
+            <div class="audit-icon ai-red" aria-hidden="true"><svg data-lucide="alert-circle"></svg></div>
+            <div class="audit-body">
+              <strong>VIOLATION: Blocked App Launch — TBL-014</strong>
+              <span>Package: com.whatsapp. Policy: Exam Kiosk v2.3. Session: S.3 Chemistry Mock. Agent blocked execution and logged event.</span>
+              <div class="audit-hash" title="SHA-256 hash of this log entry">SHA-256: b72d8fa3c19e4…</div>
+            </div>
+            <div class="audit-time">09:47 AM · Today</div>
+          </div>
+          <div class="audit-item">
+            <div class="audit-icon ai-green" aria-hidden="true"><svg data-lucide="shield-check"></svg></div>
+            <div class="audit-body">
+              <strong>Policy Bundle Applied — TBL-014, TBL-015, TBL-016</strong>
+              <span>Exam Mode v2.3 deployed. RSA-2048 signature verified on all 3 devices. Activation time: 09:30:00 UTC+3.</span>
+              <div class="audit-hash">SHA-256: a3f9c1d7e08b2…</div>
+            </div>
+            <div class="audit-time">09:30 AM · Today</div>
+          </div>
+          <div class="audit-item">
+            <div class="audit-icon ai-blue" aria-hidden="true"><svg data-lucide="user-plus"></svg></div>
+            <div class="audit-body">
+              <strong>Device Enrollment — QR Code · TBL-047</strong>
+              <span>Model: Tecno Camon 20. Serial: TECNO-C20-1122. Class: S.5 PCM. Enrollment token consumed (single-use). Admin: Ouma.</span>
+              <div class="audit-hash">SHA-256: c18e03b4f22d9…</div>
+            </div>
+            <div class="audit-time">08:15 AM · Today</div>
+          </div>
+          <div class="audit-item">
+            <div class="audit-icon ai-amber" aria-hidden="true"><svg data-lucide="refresh-cw"></svg></div>
+            <div class="audit-body">
+              <strong>Offline Sync Completed — 12 Devices via Wi-Fi</strong>
+              <span>All 12 policy bundles verified. Signatures valid. Server: EduGuard-Pi-01. SSID: EduGuard-Internal. Duration: 38s.</span>
+              <div class="audit-hash">SHA-256: e99f21c8a13f7…</div>
+            </div>
+            <div class="audit-time">07:58 AM · Today</div>
+          </div>
+          <div class="audit-item">
+            <div class="audit-icon ai-green" aria-hidden="true"><svg data-lucide="key-round"></svg></div>
+            <div class="audit-body">
+              <strong>Admin Login — Successful</strong>
+              <span>User: admin.ouma@kampala-sec.ug. IP: 192.168.1.10 (LAN). 2FA: verified. Session token issued.</span>
+              <div class="audit-hash">SHA-256: f0a12b9c4d5e1…</div>
+            </div>
+            <div class="audit-time">07:30 AM · Today</div>
+          </div>
+          <div class="audit-item">
+            <div class="audit-icon ai-amber" aria-hidden="true"><svg data-lucide="alert-triangle"></svg></div>
+            <div class="audit-body">
+              <strong>VIOLATION: Screenshot Attempt — TBL-007</strong>
+              <span>System UI screenshot intercepted by EduGuard agent. Exam session active. Evidence screenshot blocked and attempt logged.</span>
+              <div class="audit-hash">SHA-256: 9db3714a2c88e…</div>
+            </div>
+            <div class="audit-time">03:15 PM · Yesterday</div>
+          </div>
+          <div class="audit-item">
+            <div class="audit-icon ai-green" aria-hidden="true"><svg data-lucide="edit-3"></svg></div>
+            <div class="audit-body">
+              <strong>Policy Updated — App Whitelist STEM v1.4</strong>
+              <span>Added: org.geogebra.android. Removed: com.duolingo. Updated by: Admin Ouma. Re-signed with RSA-2048 key.</span>
+              <div class="audit-hash">SHA-256: 1fe84c6b9a03d…</div>
+            </div>
+            <div class="audit-time">11:20 AM · Yesterday</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ============================= -->
+    <!-- PAGE: VIOLATIONS              -->
+    <!-- ============================= -->
+    <main class="page" id="page-violations" aria-labelledby="violationsTitle">
+      <div class="page-header">
+        <div>
+          <h1 id="violationsTitle">Policy Violations</h1>
+          <p>4 active violations requiring review. Forensic evidence attached to each entry.</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-outline" onclick="showToast('Evidence package exported')">
+            <svg data-lucide="download" aria-hidden="true"></svg> Export Evidence
+          </button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-body">
+          <table class="data-table" aria-label="Policy violations table">
+            <thead>
+              <tr>
+                <th>Severity</th>
+                <th>Device</th>
+                <th>Violation Type</th>
+                <th>Policy Violated</th>
+                <th>Timestamp</th>
+                <th>Status</th>
+                <th>Evidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="alert-severity sev-high">HIGH</span></td>
+                <td><span class="device-name">TBL-014</span><span class="device-id">Tecno Spark 8</span></td>
+                <td>Blocked App Launch (WhatsApp)</td>
+                <td>Exam Kiosk v2.3</td>
+                <td>Today 09:47 AM</td>
+                <td><span class="pill pill-violation">Open</span></td>
+                <td><button class="action-btn" onclick="showToast('Evidence log opened for TBL-014')">View Evidence</button></td>
+              </tr>
+              <tr>
+                <td><span class="alert-severity sev-medium">MED</span></td>
+                <td><span class="device-name">TBL-007</span><span class="device-id">Samsung A05</span></td>
+                <td>Screenshot Attempt (Blocked)</td>
+                <td>Exam Kiosk v2.2</td>
+                <td>Yesterday 3:15 PM</td>
+                <td><span class="pill pill-violation">Open</span></td>
+                <td><button class="action-btn" onclick="showToast('Evidence log opened for TBL-007')">View Evidence</button></td>
+              </tr>
+              <tr>
+                <td><span class="alert-severity sev-medium">MED</span></td>
+                <td><span class="device-name">TBL-031</span><span class="device-id">Samsung A14</span></td>
+                <td>Policy Not Applied (Sync Overdue 36h)</td>
+                <td>App Whitelist STEM</td>
+                <td>Yesterday 8:00 AM</td>
+                <td><span class="pill pill-warning">Pending</span></td>
+                <td><button class="action-btn" onclick="showToast('Sync log opened for TBL-031')">View Sync Log</button></td>
+              </tr>
+              <tr>
+                <td><span class="alert-severity sev-low">LOW</span></td>
+                <td><span class="device-name">TBL-002</span><span class="device-id">Itel A70</span></td>
+                <td>Brightness Override Outside Kiosk</td>
+                <td>Session Timetable v1.1</td>
+                <td>Monday 2:30 PM</td>
+                <td><span class="pill pill-compliant">Resolved</span></td>
+                <td><button class="action-btn" onclick="showToast('Evidence log opened for TBL-002')">View Evidence</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <!-- ============================= -->
+    <!-- PAGE: REPORTS                 -->
+    <!-- ============================= -->
+    <main class="page" id="page-reports" aria-labelledby="reportsTitle">
+      <div class="page-header">
+        <div>
+          <h1 id="reportsTitle">Reports</h1>
+          <p>Generate compliance, forensic, and usage reports for school administration and academic submission.</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary" onclick="showToast('Generating full report PDF...')">
+            <svg data-lucide="file-text" aria-hidden="true"></svg> Generate Report
+          </button>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Device Compliance — This Week</span></div>
+          <div class="mini-chart" style="padding:1.5rem;" aria-label="Weekly compliance chart">
+            <div class="chart-row"><span class="chart-label">Monday</span><div class="chart-bar-wrap"><div class="chart-bar cb-green" style="width:91%"></div></div><span class="chart-val">91%</span></div>
+            <div class="chart-row"><span class="chart-label">Tuesday</span><div class="chart-bar-wrap"><div class="chart-bar cb-green" style="width:88%"></div></div><span class="chart-val">88%</span></div>
+            <div class="chart-row"><span class="chart-label">Wednesday</span><div class="chart-bar-wrap"><div class="chart-bar cb-amber" style="width:74%"></div></div><span class="chart-val">74%</span></div>
+            <div class="chart-row"><span class="chart-label">Thursday</span><div class="chart-bar-wrap"><div class="chart-bar cb-green" style="width:86%"></div></div><span class="chart-val">86%</span></div>
+            <div class="chart-row"><span class="chart-label">Friday</span><div class="chart-bar-wrap"><div class="chart-bar cb-green" style="width:84%"></div></div><span class="chart-val">84%</span></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Top Blocked Apps This Week</span></div>
+          <div class="mini-chart" style="padding:1.5rem;" aria-label="Blocked applications chart">
+            <div class="chart-row"><span class="chart-label">WhatsApp</span><div class="chart-bar-wrap"><div class="chart-bar cb-red" style="width:84%"></div></div><span class="chart-val">21</span></div>
+            <div class="chart-row"><span class="chart-label">YouTube</span><div class="chart-bar-wrap"><div class="chart-bar cb-red" style="width:64%"></div></div><span class="chart-val">16</span></div>
+            <div class="chart-row"><span class="chart-label">TikTok</span><div class="chart-bar-wrap"><div class="chart-bar cb-amber" style="width:48%"></div></div><span class="chart-val">12</span></div>
+            <div class="chart-row"><span class="chart-label">Facebook</span><div class="chart-bar-wrap"><div class="chart-bar cb-amber" style="width:32%"></div></div><span class="chart-val">8</span></div>
+            <div class="chart-row"><span class="chart-label">Chrome</span><div class="chart-bar-wrap"><div class="chart-bar cb-blue" style="width:20%"></div></div><span class="chart-val">5</span></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ============================= -->
+    <!-- PAGE: APPS                    -->
+    <!-- ============================= -->
+    <main class="page" id="page-apps" aria-labelledby="appsTitle">
+      <div class="page-header">
+        <div><h1 id="appsTitle">Application Control</h1><p>Manage the app whitelist and blocklist for all device groups.</p></div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary" onclick="showToast('Add app dialog opened...')">
+            <svg data-lucide="plus" aria-hidden="true"></svg> Add App
+          </button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Whitelisted Applications</span><span style="font-size:0.82rem;color:var(--text-muted);">12 apps approved for student use</span></div>
+        <div class="panel-body">
+          <table class="data-table" aria-label="Whitelisted applications">
+            <thead><tr><th>Application</th><th>Package ID</th><th>Category</th><th>Classes</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Khan Academy</strong></td><td class="device-id">org.khanacademy.android</td><td>Education</td><td>All</td><td><span class="pill pill-online">Allowed</span></td><td><button class="action-btn" onclick="showToast('App details opened')">Details</button></td></tr>
+              <tr><td><strong>GeoGebra</strong></td><td class="device-id">org.geogebra.android</td><td>Maths</td><td>S.1–S.6</td><td><span class="pill pill-online">Allowed</span></td><td><button class="action-btn" onclick="showToast('App details opened')">Details</button></td></tr>
+              <tr><td><strong>Periodic Table</strong></td><td class="device-id">mendeleev.periodic.table</td><td>Science</td><td>S.3–S.6</td><td><span class="pill pill-online">Allowed</span></td><td><button class="action-btn" onclick="showToast('App details opened')">Details</button></td></tr>
+              <tr><td><strong>WhatsApp</strong></td><td class="device-id">com.whatsapp</td><td>Social</td><td>—</td><td><span class="pill pill-offline">Blocked</span></td><td><button class="action-btn" onclick="showToast('Block rule edited')">Edit Rule</button></td></tr>
+              <tr><td><strong>TikTok</strong></td><td class="device-id">com.zhiliaoapp.musically</td><td>Social</td><td>—</td><td><span class="pill pill-offline">Blocked</span></td><td><button class="action-btn" onclick="showToast('Block rule edited')">Edit Rule</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <!-- ============================= -->
+    <!-- PAGE: SETTINGS                -->
+    <!-- ============================= -->
+    <main class="page" id="page-settings" aria-labelledby="settingsTitle">
+      <div class="page-header">
+        <div><h1 id="settingsTitle">Settings</h1><p>Configure EduGuard MDM server, sync, and security parameters.</p></div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary" onclick="showToast('Settings saved successfully!')">
+            <svg data-lucide="save" aria-hidden="true"></svg> Save Changes
+          </button>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">School Configuration</span></div>
+          <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem;">
+            <div>
+              <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;" for="cfg-school">School Name</label>
+              <input id="cfg-school" type="text" value="Kampala Secondary School" style="width:100%;padding:0.6rem 0.85rem;border:1.5px solid var(--border);border-radius:6px;font-size:0.88rem;outline:none;" />
+            </div>
+            <div>
+              <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;" for="cfg-district">District</label>
+              <input id="cfg-district" type="text" value="Kampala" style="width:100%;padding:0.6rem 0.85rem;border:1.5px solid var(--border);border-radius:6px;font-size:0.88rem;outline:none;" />
+            </div>
+            <div>
+              <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;" for="cfg-server">Server IP (Raspberry Pi)</label>
+              <input id="cfg-server" type="text" value="192.168.1.100" style="width:100%;padding:0.6rem 0.85rem;border:1.5px solid var(--border);border-radius:6px;font-size:0.88rem;font-family:monospace;outline:none;" />
+            </div>
+            <div>
+              <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;" for="cfg-interval">Sync Interval (minutes)</label>
+              <input id="cfg-interval" type="number" value="15" min="1" max="1440" style="width:100%;padding:0.6rem 0.85rem;border:1.5px solid var(--border);border-radius:6px;font-size:0.88rem;outline:none;" />
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Security &amp; Forensics</span></div>
+          <div style="padding:1.5rem;display:flex;flex-direction:column;gap:0.85rem;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem;background:var(--bg);border-radius:6px;font-size:0.88rem;">
+              <div><strong>AES-256 Policy Encryption</strong><div style="font-size:0.78rem;color:var(--text-muted);">Encrypt all policy bundles at rest</div></div>
+              <span class="pill pill-online">Enabled</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem;background:var(--bg);border-radius:6px;font-size:0.88rem;">
+              <div><strong>RSA-2048 Bundle Signing</strong><div style="font-size:0.78rem;color:var(--text-muted);">Sign all policies before distribution</div></div>
+              <span class="pill pill-online">Enabled</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem;background:var(--bg);border-radius:6px;font-size:0.88rem;">
+              <div><strong>Hash-Chained Audit Log</strong><div style="font-size:0.78rem;color:var(--text-muted);">SHA-256 chain for tamper evidence</div></div>
+              <span class="pill pill-online">Enabled</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem;background:var(--bg);border-radius:6px;font-size:0.88rem;">
+              <div><strong>Two-Factor Auth (Admin)</strong><div style="font-size:0.78rem;color:var(--text-muted);">TOTP 2FA for admin login</div></div>
+              <span class="pill pill-online">Enabled</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem;background:var(--bg);border-radius:6px;font-size:0.88rem;">
+              <div><strong>Offline Mode Only</strong><div style="font-size:0.78rem;color:var(--text-muted);">Restrict server to LAN only (no WAN)</div></div>
+              <span class="pill pill-warning">Optional</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div><!-- end main-content -->
+</div><!-- end shell -->
+
+<!-- === TOAST NOTIFICATION === -->
+<div class="toast" id="toast" role="alert" aria-live="assertive">
+  <svg data-lucide="check-circle" aria-hidden="true"></svg>
+  <span id="toastMsg">Action completed</span>
+</div>
+
+<script>
+  /* === LUCIDE ICON INIT === */
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  });
+
+  /* === SIDEBAR NAVIGATION === */
+  const navItems = document.querySelectorAll('.nav-item[data-page]');
+  const pages = document.querySelectorAll('.page');
+  const pageTitle = document.getElementById('pageTitle');
+  const breadcrumb = document.getElementById('breadcrumbCurrent');
+
+  const pageMeta = {
+    dashboard:  { title: 'Dashboard',          crumb: 'Overview' },
+    devices:    { title: 'Enrolled Devices',    crumb: 'Devices' },
+    policies:   { title: 'Security Policies',   crumb: 'Policies' },
+    apps:       { title: 'Application Control', crumb: 'Applications' },
+    auditlog:   { title: 'Forensic Audit Log',  crumb: 'Audit Log' },
+    violations: { title: 'Policy Violations',   crumb: 'Violations' },
+    reports:    { title: 'Reports',             crumb: 'Reports' },
+    settings:   { title: 'Settings',            crumb: 'Settings' },
+  };
+
+  function navigate(pageId) {
+    navItems.forEach(item => {
+      const isActive = item.dataset.page === pageId;
+      item.classList.toggle('active', isActive);
+      item.setAttribute('aria-current', isActive ? 'page' : 'false');
+    });
+    pages.forEach(page => page.classList.toggle('active', page.id === `page-${pageId}`));
+    if (pageMeta[pageId]) {
+      pageTitle.textContent = pageMeta[pageId].title;
+      breadcrumb.textContent = pageMeta[pageId].crumb;
+    }
+    window.scrollTo(0, 0);
+    // Close mobile sidebar
+    document.getElementById('sidebar').classList.remove('open');
+    // Re-init icons for new page content
+    setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 50);
+  }
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => navigate(item.dataset.page));
+    item.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(item.dataset.page); } });
+  });
+
+  /* === MOBILE SIDEBAR TOGGLE === */
+  document.getElementById('sidebarToggle').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open');
+  });
+
+  /* === NOTIFICATION PANEL === */
+  const notifBtn = document.getElementById('notifBtn');
+  const notifPanel = document.getElementById('notifPanel');
+  notifBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = notifPanel.classList.toggle('open');
+    notifBtn.setAttribute('aria-expanded', isOpen);
+  });
+  document.addEventListener('click', () => {
+    notifPanel.classList.remove('open');
+    notifBtn.setAttribute('aria-expanded', 'false');
+  });
+
+  /* === TOAST NOTIFICATION === */
+  let toastTimer;
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMsg');
+    toastMsg.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.classList.remove('show');
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }, 2800);
+  }
+
+  /* === SYNC STATUS SIMULATOR (Offline-First Demo) === */
+  const syncBadge = document.getElementById('syncBadge');
+  const syncText  = document.getElementById('syncText');
+  const onlineCount = document.getElementById('onlineCount');
+  let isSynced = true;
+  let onlineN = 32;
+
+  setInterval(() => {
+    isSynced = !isSynced;
+    if (isSynced) {
+      syncBadge.className = 'sync-badge synced';
+      syncText.textContent = 'Synced';
+      onlineN = Math.floor(Math.random() * 6) + 30;
+      if (onlineCount) onlineCount.textContent = onlineN;
+    } else {
+      syncBadge.className = 'sync-badge offline';
+      syncText.textContent = 'Offline Mode';
+      onlineN = Math.floor(Math.random() * 4) + 5;
+      if (onlineCount) onlineCount.textContent = onlineN;
+    }
+  }, 8000);
+
+  /* === DEVICE SEARCH FILTER === */
+  function filterDevices(query) {
+    const q = query.toLowerCase().trim();
+    const rows = document.querySelectorAll('#devicesTableBody tr');
+    rows.forEach(row => {
+      row.style.display = q === '' || row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+</script>
+</body>
+</html>
