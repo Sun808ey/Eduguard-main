@@ -463,6 +463,20 @@
     }
     .app-scope-option { display: flex !important; align-items: center; gap: 0.45rem; font-size: 0.8rem !important; font-weight: 500 !important; }
 
+    /* === SETTINGS === */
+    .settings-lock-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: 0.9rem 0.95rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg);
+    }
+    .settings-lock-row__copy strong { display: block; margin-bottom: 0.15rem; }
+    .settings-toggle-row {
+      display: flex !important; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: 0.9rem 0.95rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg);
+    }
+    .settings-toggle-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--green-800); }
+    .settings-toggle-row.is-offline-disabled input[type="checkbox"] { accent-color: var(--green-800); }
+    .settings-modal-error { color: var(--red); font-size: 0.78rem; min-height: 1rem; margin-top: 0.35rem; }
+
     /* === AUDIT LOG === */
     .audit-list { padding: 0; }
     .audit-item {
@@ -1463,14 +1477,17 @@
       <div class="page-header">
         <div><h1 id="settingsTitle">Settings</h1><p>Configure EduGuard MDM server, sync, and security parameters.</p></div>
         <div class="page-header-actions">
-          <button class="btn btn-primary" onclick="showToast('Settings saved successfully!')">
+          <button class="btn btn-outline btn-danger" id="rotateKeysBtn" type="button">
+            <svg data-lucide="refresh-cw" aria-hidden="true"></svg> Rotate Encryption Keys
+          </button>
+          <button class="btn btn-primary" id="saveSettingsBtn" type="button">
             <svg data-lucide="save" aria-hidden="true"></svg> Save Changes
           </button>
         </div>
       </div>
       <div class="grid-2">
         <div class="panel">
-          <div class="panel-header"><span class="panel-title">School Configuration</span></div>
+          <div class="panel-header"><span class="panel-title">School Configuration</span><span class="app-summary-note">LAN-only sync settings</span></div>
           <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem;">
             <div>
               <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;" for="cfg-school">School Name</label>
@@ -1481,8 +1498,9 @@
               <input id="cfg-district" type="text" value="Kampala" style="width:100%;padding:0.6rem 0.85rem;border:1.5px solid var(--border);border-radius:6px;font-size:0.88rem;outline:none;" />
             </div>
             <div>
-              <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;" for="cfg-server">Server IP (Raspberry Pi)</label>
-              <input id="cfg-server" type="text" value="192.168.1.100" style="width:100%;padding:0.6rem 0.85rem;border:1.5px solid var(--border);border-radius:6px;font-size:0.88rem;font-family:monospace;outline:none;" />
+              <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;" for="cfg-server">Server IP (LAN)</label>
+              <input id="cfg-server" type="text" value="192.168.1.100" inputmode="numeric" placeholder="192.168.1.100" style="width:100%;padding:0.6rem 0.85rem;border:1.5px solid var(--border);border-radius:6px;font-size:0.88rem;font-family:monospace;outline:none;" />
+              <div class="app-modal__error" id="serverIpError"></div>
             </div>
             <div>
               <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;" for="cfg-interval">Sync Interval (minutes)</label>
@@ -1491,28 +1509,28 @@
           </div>
         </div>
         <div class="panel">
-          <div class="panel-header"><span class="panel-title">Security &amp; Forensics</span></div>
+          <div class="panel-header"><span class="panel-title">Security &amp; Forensics</span><span class="app-summary-note">Compliance-locked controls</span></div>
           <div style="padding:1.5rem;display:flex;flex-direction:column;gap:0.85rem;">
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem;background:var(--bg);border-radius:6px;font-size:0.88rem;">
-              <div><strong>AES-256 Policy Encryption</strong><div style="font-size:0.78rem;color:var(--text-muted);">Encrypt all policy bundles at rest</div></div>
-              <span class="pill pill-online">Enabled</span>
+            <div class="settings-lock-row" title="Required for security compliance">
+              <div class="settings-lock-row__copy"><strong>AES-256 Encryption</strong><div style="font-size:0.78rem;color:var(--text-muted);">Encrypt all policy bundles at rest</div></div>
+              <span class="pill pill-online"><svg data-lucide="lock" aria-hidden="true" style="width:12px;height:12px"></svg> ON</span>
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem;background:var(--bg);border-radius:6px;font-size:0.88rem;">
-              <div><strong>RSA-2048 Bundle Signing</strong><div style="font-size:0.78rem;color:var(--text-muted);">Sign all policies before distribution</div></div>
-              <span class="pill pill-online">Enabled</span>
+            <div class="settings-lock-row" title="Required for security compliance">
+              <div class="settings-lock-row__copy"><strong>RSA-2048 Signing</strong><div style="font-size:0.78rem;color:var(--text-muted);">Sign all policies before distribution</div></div>
+              <span class="pill pill-online"><svg data-lucide="lock" aria-hidden="true" style="width:12px;height:12px"></svg> ON</span>
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem;background:var(--bg);border-radius:6px;font-size:0.88rem;">
-              <div><strong>Hash-Chained Audit Log</strong><div style="font-size:0.78rem;color:var(--text-muted);">SHA-256 chain for tamper evidence</div></div>
-              <span class="pill pill-online">Enabled</span>
+            <div class="settings-lock-row" title="Required for security compliance">
+              <div class="settings-lock-row__copy"><strong>Hash-Chained Logs</strong><div style="font-size:0.78rem;color:var(--text-muted);">SHA-256 chain for tamper evidence</div></div>
+              <span class="pill pill-online"><svg data-lucide="lock" aria-hidden="true" style="width:12px;height:12px"></svg> ON</span>
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem;background:var(--bg);border-radius:6px;font-size:0.88rem;">
-              <div><strong>Two-Factor Auth (Admin)</strong><div style="font-size:0.78rem;color:var(--text-muted);">TOTP 2FA for admin login</div></div>
-              <span class="pill pill-online">Enabled</span>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:0.85rem;background:var(--bg);border-radius:6px;font-size:0.88rem;">
-              <div><strong>Offline Mode Only</strong><div style="font-size:0.78rem;color:var(--text-muted);">Restrict server to LAN only (no WAN)</div></div>
-              <span class="pill pill-warning">Optional</span>
-            </div>
+            <label class="settings-toggle-row" for="cfg-2fa">
+              <div><strong>2FA</strong><div style="font-size:0.78rem;color:var(--text-muted);">TOTP two-factor authentication for admins</div></div>
+              <input id="cfg-2fa" type="checkbox" />
+            </label>
+            <label class="settings-toggle-row" for="cfg-offline-only">
+              <div><strong>Offline-Only Mode</strong><div style="font-size:0.78rem;color:var(--text-muted);">Restrict server to LAN only (no WAN)</div></div>
+              <input id="cfg-offline-only" type="checkbox" checked />
+            </label>
           </div>
         </div>
       </div>
@@ -1845,6 +1863,85 @@
     });
   }
 
+  function isLanIp(value) {
+    const ip = String(value || '').trim();
+    const octet = '(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)';
+    const privateIp = new RegExp(`^(10\\.${octet}\\.${octet}\\.${octet}|172\\.(1[6-9]|2\\d|3[0-1])\\.${octet}\\.${octet}|192\\.168\\.${octet}\\.${octet}|127\\.${octet}\\.${octet}\\.${octet}|localhost)$`, 'i');
+    return privateIp.test(ip);
+  }
+
+  function openRotateKeysModal() {
+    const backdrop = document.createElement('div');
+    backdrop.className = 'app-modal-backdrop';
+    backdrop.innerHTML = `
+      <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="rotateKeysTitle">
+        <div class="app-modal__header">
+          <h2 id="rotateKeysTitle">Rotate encryption keys</h2>
+          <button class="app-modal__close" type="button" aria-label="Close dialog">×</button>
+        </div>
+        <div class="app-modal__body">
+          <p>This will rotate the school encryption keys used for policy bundles and audit protection.</p>
+          <div class="app-modal__hint" style="margin-top:0.5rem;">A new key pair will be generated and the previous key set will be retired.</div>
+          <div class="page-header-actions" style="justify-content:flex-end; margin-top:1rem;">
+            <button class="btn btn-outline" type="button" data-rotate-cancel>Cancel</button>
+            <button class="btn btn-danger" type="button" data-rotate-confirm>Rotate Keys</button>
+          </div>
+        </div>
+      </section>
+    `;
+
+    document.body.appendChild(backdrop);
+    const close = () => backdrop.remove();
+    backdrop.querySelector('.app-modal__close').addEventListener('click', close);
+    backdrop.querySelector('[data-rotate-cancel]').addEventListener('click', close);
+    backdrop.addEventListener('click', (event) => { if (event.target === backdrop) close(); });
+    backdrop.querySelector('[data-rotate-confirm]').addEventListener('click', () => {
+      close();
+      showToast('Encryption keys rotated successfully');
+    });
+  }
+
+  function initSettingsSection() {
+    const saveButton = document.getElementById('saveSettingsBtn');
+    const rotateButton = document.getElementById('rotateKeysBtn');
+    const serverInput = document.getElementById('cfg-server');
+    const errorNode = document.getElementById('serverIpError');
+    const twoFa = document.getElementById('cfg-2fa');
+    const offlineOnly = document.getElementById('cfg-offline-only');
+    const lockedRows = document.querySelectorAll('.settings-lock-row');
+
+    if (!saveButton || !rotateButton || !serverInput || !errorNode || !twoFa || !offlineOnly) return;
+
+    lockedRows.forEach((row) => {
+      row.setAttribute('title', 'Required for security compliance');
+    });
+
+    const validateServerIp = () => {
+      const valid = isLanIp(serverInput.value);
+      errorNode.textContent = valid ? '' : 'Server IP must be a LAN address such as 192.168.x.x, 10.x.x.x, 172.16-31.x.x, localhost, or 127.x.x.x.';
+      serverInput.setAttribute('aria-invalid', valid ? 'false' : 'true');
+      return valid;
+    };
+
+    serverInput.addEventListener('input', validateServerIp);
+    validateServerIp();
+
+    saveButton.addEventListener('click', () => {
+      if (!validateServerIp()) return;
+      showToast('Settings saved successfully!');
+    });
+
+    rotateButton.addEventListener('click', openRotateKeysModal);
+
+    twoFa.addEventListener('change', () => {
+      showToast(twoFa.checked ? '2FA enabled' : '2FA disabled');
+    });
+
+    offlineOnly.addEventListener('change', () => {
+      showToast(offlineOnly.checked ? 'Offline-only mode enabled' : 'Offline-only mode disabled');
+    });
+  }
+
   function navigate(pageId) {
     navItems.forEach(item => {
       const isActive = item.dataset.page === pageId;
@@ -1932,6 +2029,7 @@
   }
 
   initAppControl();
+  initSettingsSection();
 </script>
 </body>
 </html>
