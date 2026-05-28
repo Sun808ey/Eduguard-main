@@ -168,3 +168,4 @@ def require_role(*roles: str) -> Callable[[F], F]:
         return wrapper  # type: ignore[return-value]
 
     return decorator
+
