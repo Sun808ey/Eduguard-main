@@ -388,6 +388,50 @@
       background: var(--bg-white); color: var(--text); outline: none; cursor: pointer;
     }
 
+    /* === APP CONTROL === */
+    .app-summary-badges {
+      display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .app-summary-note { font-size: 0.82rem; color: var(--text-muted); }
+    .app-modal-backdrop {
+      position: fixed; inset: 0; background: rgba(13, 61, 34, 0.52);
+      display: flex; align-items: center; justify-content: center; padding: 1rem;
+      z-index: 120; backdrop-filter: blur(2px);
+    }
+    .app-modal {
+      width: min(760px, 100%); background: var(--bg-white); border-radius: 16px;
+      box-shadow: var(--shadow-md); border: 1px solid var(--border); overflow: hidden;
+    }
+    .app-modal__header {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: 1rem 1.25rem; border-bottom: 1px solid var(--border);
+    }
+    .app-modal__header h2 { font-size: 1.05rem; }
+    .app-modal__close {
+      border: 1px solid var(--border); background: var(--bg-white); color: var(--text-muted);
+      width: 34px; height: 34px; border-radius: 50%; font-size: 1.1rem;
+    }
+    .app-modal__body { padding: 1.25rem; }
+    .app-modal__grid {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.9rem;
+    }
+    .app-modal__field {
+      padding: 0.85rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg);
+    }
+    .app-modal__field span { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.2rem; }
+    .app-modal__field strong { font-size: 0.92rem; color: var(--text); }
+    .app-modal__list { margin: 0.75rem 0 0; padding-left: 1.05rem; color: var(--text); }
+    .app-modal__list li { margin: 0.25rem 0; }
+    .app-modal__form { display: grid; gap: 0.85rem; }
+    .app-modal__form .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.85rem; }
+    .app-modal__form label { display: grid; gap: 0.35rem; font-size: 0.85rem; font-weight: 600; }
+    .app-modal__form input, .app-modal__form select, .app-modal__form textarea {
+      width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 0.65rem 0.8rem;
+      font: inherit; background: var(--bg-white); color: var(--text);
+    }
+    .app-modal__form textarea { min-height: 88px; resize: vertical; }
+
     /* === AUDIT LOG === */
     .audit-list { padding: 0; }
     .audit-item {
@@ -1338,22 +1382,45 @@
       <div class="page-header">
         <div><h1 id="appsTitle">Application Control</h1><p>Manage the app whitelist and blocklist for all device groups.</p></div>
         <div class="page-header-actions">
-          <button class="btn btn-primary" onclick="showToast('Add app dialog opened...')">
+          <button class="btn btn-primary" id="appAddBtn" onclick="showToast('Add app dialog opened...')">
             <svg data-lucide="plus" aria-hidden="true"></svg> Add App
           </button>
         </div>
       </div>
       <div class="panel">
-        <div class="panel-header"><span class="panel-title">Whitelisted Applications</span><span style="font-size:0.82rem;color:var(--text-muted);">12 apps approved for student use</span></div>
+        <div class="panel-header">
+          <span class="panel-title">Whitelisted Applications</span>
+          <div class="app-summary-badges">
+            <span class="app-summary-note" id="appsSummaryText">12 apps approved for student use</span>
+            <span class="pill pill-compliant" id="appsAllowedCount">Allowed 0</span>
+            <span class="pill pill-offline" id="appsBlockedCount">Blocked 0</span>
+          </div>
+        </div>
+        <div class="filter-bar" role="search" aria-label="Application filters">
+          <div class="search-input-wrap">
+            <svg data-lucide="search" aria-hidden="true"></svg>
+            <input type="search" class="search-input" id="appSearch" placeholder="Search app, package ID, or category…" aria-label="Search applications" />
+          </div>
+          <select class="filter-select" id="appStatusFilter" aria-label="Filter applications by status">
+            <option value="">All Statuses</option>
+            <option value="Allowed">Allowed</option>
+            <option value="Blocked">Blocked</option>
+            <option value="Review">Review</option>
+          </select>
+          <select class="filter-select" id="appCategoryFilter" aria-label="Filter applications by category">
+            <option value="">All Categories</option>
+            <option value="Education">Education</option>
+            <option value="Maths">Maths</option>
+            <option value="Science">Science</option>
+            <option value="Social">Social</option>
+            <option value="Browser">Browser</option>
+          </select>
+        </div>
         <div class="panel-body">
           <table class="data-table" aria-label="Whitelisted applications">
             <thead><tr><th>Application</th><th>Package ID</th><th>Category</th><th>Classes</th><th>Status</th><th>Action</th></tr></thead>
-            <tbody>
-              <tr><td><strong>Khan Academy</strong></td><td class="device-id">org.khanacademy.android</td><td>Education</td><td>All</td><td><span class="pill pill-online">Allowed</span></td><td><button class="action-btn" onclick="showToast('App details opened')">Details</button></td></tr>
-              <tr><td><strong>GeoGebra</strong></td><td class="device-id">org.geogebra.android</td><td>Maths</td><td>S.1–S.6</td><td><span class="pill pill-online">Allowed</span></td><td><button class="action-btn" onclick="showToast('App details opened')">Details</button></td></tr>
-              <tr><td><strong>Periodic Table</strong></td><td class="device-id">mendeleev.periodic.table</td><td>Science</td><td>S.3–S.6</td><td><span class="pill pill-online">Allowed</span></td><td><button class="action-btn" onclick="showToast('App details opened')">Details</button></td></tr>
-              <tr><td><strong>WhatsApp</strong></td><td class="device-id">com.whatsapp</td><td>Social</td><td>—</td><td><span class="pill pill-offline">Blocked</span></td><td><button class="action-btn" onclick="showToast('Block rule edited')">Edit Rule</button></td></tr>
-              <tr><td><strong>TikTok</strong></td><td class="device-id">com.zhiliaoapp.musically</td><td>Social</td><td>—</td><td><span class="pill pill-offline">Blocked</span></td><td><button class="action-btn" onclick="showToast('Block rule edited')">Edit Rule</button></td></tr>
+            <tbody id="appsTableBody">
+              <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:1.25rem;">Loading applications…</td></tr>
             </tbody>
           </table>
         </div>
@@ -1454,6 +1521,200 @@
     settings:   { title: 'Settings',            crumb: 'Settings' },
   };
 
+  const appRules = [
+    { id: 'APP-001', name: 'Khan Academy', packageId: 'org.khanacademy.android', category: 'Education', classes: 'All', status: 'Allowed', summary: 'Student learning and homework practice.', rules: ['Approved for all grades', 'Offline lessons enabled', 'Telemetry limited to usage stats'] },
+    { id: 'APP-002', name: 'GeoGebra', packageId: 'org.geogebra.android', category: 'Maths', classes: 'S.1–S.6', status: 'Allowed', summary: 'Mathematics and geometry toolkit for class work.', rules: ['Approved for maths labs', 'No external browser launch', 'Teacher override allowed'] },
+    { id: 'APP-003', name: 'Periodic Table', packageId: 'mendeleev.periodic.table', category: 'Science', classes: 'S.3–S.6', status: 'Allowed', summary: 'Science reference app for chemistry classes.', rules: ['Approved for science periods', 'Offline cache retained', 'Pop-up ads disabled'] },
+    { id: 'APP-004', name: 'WhatsApp', packageId: 'com.whatsapp', category: 'Social', classes: '—', status: 'Blocked', summary: 'Blocked during all school-managed sessions.', rules: ['Blocked by default', 'Teacher escalation logs violation', 'No background sync'] },
+    { id: 'APP-005', name: 'TikTok', packageId: 'com.zhiliaoapp.musically', category: 'Social', classes: '—', status: 'Blocked', summary: 'Blocked to keep student devices focused on instruction.', rules: ['Blocked by default', 'Requires admin review to unblock', 'Usage attempts logged'] },
+    { id: 'APP-006', name: 'Chrome', packageId: 'com.android.chrome', category: 'Browser', classes: 'All', status: 'Review', summary: 'Browser allowed only when a lesson requires web access.', rules: ['Teacher approval required', 'Search safe mode enabled', 'Session limit 30 minutes'] },
+  ];
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function getAppFilters() {
+    return {
+      query: (document.getElementById('appSearch')?.value || '').trim().toLowerCase(),
+      status: document.getElementById('appStatusFilter')?.value || '',
+      category: document.getElementById('appCategoryFilter')?.value || '',
+    };
+  }
+
+  function updateAppSummary(items) {
+    const allowed = items.filter(app => app.status === 'Allowed').length;
+    const blocked = items.filter(app => app.status === 'Blocked').length;
+    const summaryText = document.getElementById('appsSummaryText');
+    const allowedCount = document.getElementById('appsAllowedCount');
+    const blockedCount = document.getElementById('appsBlockedCount');
+    if (summaryText) summaryText.textContent = `${items.length} app${items.length === 1 ? '' : 's'} shown in student app control`;
+    if (allowedCount) allowedCount.textContent = `Allowed ${allowed}`;
+    if (blockedCount) blockedCount.textContent = `Blocked ${blocked}`;
+  }
+
+  function renderAppRules() {
+    const tbody = document.getElementById('appsTableBody');
+    if (!tbody) return;
+    const { query, status, category } = getAppFilters();
+    const filtered = appRules.filter(app => {
+      const haystack = `${app.name} ${app.packageId} ${app.category} ${app.classes} ${app.status}`.toLowerCase();
+      const matchesQuery = !query || haystack.includes(query);
+      const matchesStatus = !status || app.status === status;
+      const matchesCategory = !category || app.category === category;
+      return matchesQuery && matchesStatus && matchesCategory;
+    });
+
+    tbody.innerHTML = filtered.length
+      ? filtered.map(app => `
+        <tr data-app-id="${escapeHtml(app.id)}">
+          <td><strong>${escapeHtml(app.name)}</strong></td>
+          <td class="device-id">${escapeHtml(app.packageId)}</td>
+          <td>${escapeHtml(app.category)}</td>
+          <td>${escapeHtml(app.classes)}</td>
+          <td><span class="pill ${app.status === 'Blocked' ? 'pill-offline' : app.status === 'Review' ? 'pill-warning' : 'pill-online'}">${escapeHtml(app.status)}</span></td>
+          <td>
+            <button class="action-btn" type="button" data-app-action="details">Details</button>
+            <button class="action-btn" type="button" data-app-action="toggle">${app.status === 'Blocked' ? 'Edit Rule' : 'Review Rule'}</button>
+          </td>
+        </tr>
+      `).join('')
+      : `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:1.25rem;">No applications match the current filters.</td></tr>`;
+
+    updateAppSummary(filtered);
+  }
+
+  function openAppModal(title, bodyHtml) {
+    const backdrop = document.createElement('div');
+    backdrop.className = 'app-modal-backdrop';
+    backdrop.innerHTML = `
+      <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="appModalTitle">
+        <div class="app-modal__header">
+          <h2 id="appModalTitle">${escapeHtml(title)}</h2>
+          <button class="app-modal__close" type="button" aria-label="Close dialog">×</button>
+        </div>
+        <div class="app-modal__body">${bodyHtml}</div>
+      </section>
+    `;
+    document.body.appendChild(backdrop);
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') close();
+    };
+    const close = () => {
+      document.removeEventListener('keydown', onKeyDown);
+      backdrop.remove();
+    };
+    backdrop.querySelector('.app-modal__close').addEventListener('click', close);
+    backdrop.addEventListener('click', (event) => { if (event.target === backdrop) close(); });
+    document.addEventListener('keydown', onKeyDown);
+    return backdrop;
+  }
+
+  function openAppDetails(appId) {
+    const app = appRules.find(item => item.id === appId);
+    if (!app) return;
+    openAppModal('Application details', `
+      <div class="app-modal__grid">
+        <div class="app-modal__field"><span>Application</span><strong>${escapeHtml(app.name)}</strong></div>
+        <div class="app-modal__field"><span>Package ID</span><strong>${escapeHtml(app.packageId)}</strong></div>
+        <div class="app-modal__field"><span>Category</span><strong>${escapeHtml(app.category)}</strong></div>
+        <div class="app-modal__field"><span>Classes</span><strong>${escapeHtml(app.classes)}</strong></div>
+        <div class="app-modal__field"><span>Status</span><strong>${escapeHtml(app.status)}</strong></div>
+        <div class="app-modal__field"><span>Scope</span><strong>${escapeHtml(app.status === 'Allowed' ? 'Student use' : app.status === 'Blocked' ? 'Restricted' : 'Needs review')}</strong></div>
+      </div>
+      <div class="app-modal__field" style="margin-top:0.9rem;"><span>Summary</span><strong>${escapeHtml(app.summary)}</strong></div>
+      <div style="margin-top:0.9rem;">
+        <span class="app-summary-note">Rule checks</span>
+        <ul class="app-modal__list">
+          ${app.rules.map(rule => `<li>${escapeHtml(rule)}</li>`).join('')}
+        </ul>
+      </div>
+    `);
+  }
+
+  function openAddAppModal() {
+    const backdrop = openAppModal('Add application', `
+      <form class="app-modal__form" id="addAppForm">
+        <div class="field-grid">
+          <label>Application name<input type="text" name="name" required placeholder="Calculator Plus" /></label>
+          <label>Package ID<input type="text" name="packageId" required placeholder="com.example.calculator" /></label>
+          <label>Category<select name="category" required><option>Education</option><option>Maths</option><option>Science</option><option>Browser</option><option>Social</option></select></label>
+          <label>Status<select name="status" required><option>Allowed</option><option>Blocked</option><option>Review</option></select></label>
+          <label>Classes<input type="text" name="classes" required placeholder="S.1–S.6" /></label>
+          <label>Rule summary<input type="text" name="summary" required placeholder="Approved for lesson use" /></label>
+        </div>
+        <label>Rule notes<textarea name="rules" placeholder="One rule per line: offline cache only\nteacher override enabled"></textarea></label>
+        <div class="page-header-actions" style="justify-content:flex-end;">
+          <button class="btn btn-outline" type="button" data-app-cancel>Cancel</button>
+          <button class="btn btn-primary" type="submit">Save app</button>
+        </div>
+      </form>
+    `);
+    if (!backdrop) return;
+    const form = backdrop.querySelector('#addAppForm');
+    const close = () => backdrop.remove();
+    backdrop.querySelector('[data-app-cancel]').addEventListener('click', close);
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const nextId = `APP-${String(appRules.length + 1).padStart(3, '0')}`;
+      appRules.unshift({
+        id: nextId,
+        name: String(formData.get('name') || '').trim(),
+        packageId: String(formData.get('packageId') || '').trim(),
+        category: String(formData.get('category') || '').trim(),
+        classes: String(formData.get('classes') || '').trim(),
+        status: String(formData.get('status') || 'Review').trim(),
+        summary: String(formData.get('summary') || '').trim(),
+        rules: String(formData.get('rules') || '').split('\n').map(line => line.trim()).filter(Boolean),
+      });
+      close();
+      renderAppRules();
+      showToast('Application rule saved');
+    });
+  }
+
+  function initAppControl() {
+    const search = document.getElementById('appSearch');
+    const statusFilter = document.getElementById('appStatusFilter');
+    const categoryFilter = document.getElementById('appCategoryFilter');
+    const addButton = document.getElementById('appAddBtn');
+    const tbody = document.getElementById('appsTableBody');
+
+    if (!tbody) return;
+
+    renderAppRules();
+    search?.addEventListener('input', renderAppRules);
+    statusFilter?.addEventListener('change', renderAppRules);
+    categoryFilter?.addEventListener('change', renderAppRules);
+
+    addButton?.addEventListener('click', () => {
+      openAddAppModal();
+    });
+
+    tbody.addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-app-action]');
+      const row = event.target.closest('tr[data-app-id]');
+      if (!button || !row) return;
+      const appId = row.dataset.appId;
+      const app = appRules.find(item => item.id === appId);
+      if (!app) return;
+
+      if (button.dataset.appAction === 'details') {
+        openAppDetails(appId);
+        showToast(`${app.name} details opened`);
+      } else {
+        openAppDetails(appId);
+        showToast(`${app.name} rule review opened`);
+      }
+    });
+  }
+
   function navigate(pageId) {
     navItems.forEach(item => {
       const isActive = item.dataset.page === pageId;
@@ -1539,6 +1800,8 @@
       row.style.display = q === '' || row.textContent.toLowerCase().includes(q) ? '' : 'none';
     });
   }
+
+  initAppControl();
 </script>
 </body>
 </html>
