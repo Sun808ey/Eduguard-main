@@ -389,11 +389,35 @@
     }
 
     /* === APP CONTROL === */
+    .app-tabs {
+      display: flex; gap: 0.5rem; padding: 0 1.5rem 1rem; flex-wrap: wrap;
+    }
+    .app-tab {
+      border: 1px solid var(--border); background: var(--bg-white); color: var(--text-muted);
+      border-radius: 999px; padding: 0.55rem 0.95rem; font-size: 0.85rem; font-weight: 700;
+    }
+    .app-tab.is-active {
+      background: var(--green-800); color: #fff; border-color: var(--green-800);
+    }
     .app-summary-badges {
       display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
       justify-content: flex-end;
     }
     .app-summary-note { font-size: 0.82rem; color: var(--text-muted); }
+    .app-name-cell { display: flex; align-items: center; gap: 0.75rem; }
+    .app-icon {
+      width: 34px; height: 34px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--green-800), var(--green-600)); color: #fff; font-weight: 800; font-size: 0.8rem; flex-shrink: 0;
+    }
+    .app-category-badge {
+      display: inline-flex; align-items: center; padding: 0.25rem 0.55rem; border-radius: 999px;
+      font-size: 0.76rem; font-weight: 700; color: var(--green-800); background: var(--green-100);
+    }
+    .app-scope-list { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+    .app-scope-chip {
+      display: inline-flex; align-items: center; padding: 0.2rem 0.5rem; border-radius: 999px;
+      background: var(--bg); border: 1px solid var(--border); color: var(--text-muted); font-size: 0.74rem; font-weight: 600;
+    }
     .app-modal-backdrop {
       position: fixed; inset: 0; background: rgba(13, 61, 34, 0.52);
       display: flex; align-items: center; justify-content: center; padding: 1rem;
@@ -431,6 +455,13 @@
       font: inherit; background: var(--bg-white); color: var(--text);
     }
     .app-modal__form textarea { min-height: 88px; resize: vertical; }
+    .app-modal__error { color: var(--red); font-size: 0.78rem; min-height: 1rem; }
+    .app-modal__hint { color: var(--text-muted); font-size: 0.78rem; }
+    .app-scope-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.5rem;
+      padding: 0.85rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg);
+    }
+    .app-scope-option { display: flex !important; align-items: center; gap: 0.45rem; font-size: 0.8rem !important; font-weight: 500 !important; }
 
     /* === AUDIT LOG === */
     .audit-list { padding: 0; }
@@ -1382,10 +1413,14 @@
       <div class="page-header">
         <div><h1 id="appsTitle">Application Control</h1><p>Manage the app whitelist and blocklist for all device groups.</p></div>
         <div class="page-header-actions">
-          <button class="btn btn-primary" id="appAddBtn" onclick="showToast('Add app dialog opened...')">
+          <button class="btn btn-primary" id="appAddBtn" type="button">
             <svg data-lucide="plus" aria-hidden="true"></svg> Add App
           </button>
         </div>
+      </div>
+      <div class="app-tabs" role="tablist" aria-label="Application groups">
+        <button class="app-tab is-active" type="button" role="tab" aria-selected="true" data-app-tab="Allowed">Whitelisted Apps</button>
+        <button class="app-tab" type="button" role="tab" aria-selected="false" data-app-tab="Blocked">Blocked Apps</button>
       </div>
       <div class="panel">
         <div class="panel-header">
@@ -1401,12 +1436,6 @@
             <svg data-lucide="search" aria-hidden="true"></svg>
             <input type="search" class="search-input" id="appSearch" placeholder="Search app, package ID, or category…" aria-label="Search applications" />
           </div>
-          <select class="filter-select" id="appStatusFilter" aria-label="Filter applications by status">
-            <option value="">All Statuses</option>
-            <option value="Allowed">Allowed</option>
-            <option value="Blocked">Blocked</option>
-            <option value="Review">Review</option>
-          </select>
           <select class="filter-select" id="appCategoryFilter" aria-label="Filter applications by category">
             <option value="">All Categories</option>
             <option value="Education">Education</option>
@@ -1418,7 +1447,7 @@
         </div>
         <div class="panel-body">
           <table class="data-table" aria-label="Whitelisted applications">
-            <thead><tr><th>Application</th><th>Package ID</th><th>Category</th><th>Classes</th><th>Status</th><th>Action</th></tr></thead>
+            <thead><tr><th>App Name</th><th>Package ID</th><th>Category</th><th>Classes in scope</th><th>Status</th><th>Action</th></tr></thead>
             <tbody id="appsTableBody">
               <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:1.25rem;">Loading applications…</td></tr>
             </tbody>
@@ -1521,13 +1550,17 @@
     settings:   { title: 'Settings',            crumb: 'Settings' },
   };
 
+  const APP_CLASSES = ['All', 'S.1', 'S.2', 'S.3', 'S.4', 'S.5', 'S.6'];
+  const APP_CATEGORIES = ['Education', 'Maths', 'Science', 'Browser', 'Social'];
+  const PACKAGE_ID_PATTERN = /^[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+$/i;
+  let activeAppTab = 'Allowed';
+
   const appRules = [
-    { id: 'APP-001', name: 'Khan Academy', packageId: 'org.khanacademy.android', category: 'Education', classes: 'All', status: 'Allowed', summary: 'Student learning and homework practice.', rules: ['Approved for all grades', 'Offline lessons enabled', 'Telemetry limited to usage stats'] },
-    { id: 'APP-002', name: 'GeoGebra', packageId: 'org.geogebra.android', category: 'Maths', classes: 'S.1–S.6', status: 'Allowed', summary: 'Mathematics and geometry toolkit for class work.', rules: ['Approved for maths labs', 'No external browser launch', 'Teacher override allowed'] },
-    { id: 'APP-003', name: 'Periodic Table', packageId: 'mendeleev.periodic.table', category: 'Science', classes: 'S.3–S.6', status: 'Allowed', summary: 'Science reference app for chemistry classes.', rules: ['Approved for science periods', 'Offline cache retained', 'Pop-up ads disabled'] },
-    { id: 'APP-004', name: 'WhatsApp', packageId: 'com.whatsapp', category: 'Social', classes: '—', status: 'Blocked', summary: 'Blocked during all school-managed sessions.', rules: ['Blocked by default', 'Teacher escalation logs violation', 'No background sync'] },
-    { id: 'APP-005', name: 'TikTok', packageId: 'com.zhiliaoapp.musically', category: 'Social', classes: '—', status: 'Blocked', summary: 'Blocked to keep student devices focused on instruction.', rules: ['Blocked by default', 'Requires admin review to unblock', 'Usage attempts logged'] },
-    { id: 'APP-006', name: 'Chrome', packageId: 'com.android.chrome', category: 'Browser', classes: 'All', status: 'Review', summary: 'Browser allowed only when a lesson requires web access.', rules: ['Teacher approval required', 'Search safe mode enabled', 'Session limit 30 minutes'] },
+    { id: 'APP-001', name: 'Khan Academy', packageId: 'org.khanacademy.android', category: 'Education', scopes: ['All'], status: 'Allowed', summary: 'Student learning and homework practice.', rules: ['Approved for all grades', 'Offline lessons enabled', 'Telemetry limited to usage stats'] },
+    { id: 'APP-002', name: 'GeoGebra', packageId: 'org.geogebra.android', category: 'Maths', scopes: ['S.1', 'S.2', 'S.3', 'S.4', 'S.5', 'S.6'], status: 'Allowed', summary: 'Mathematics and geometry toolkit for class work.', rules: ['Approved for maths labs', 'No external browser launch', 'Teacher override allowed'] },
+    { id: 'APP-003', name: 'Periodic Table', packageId: 'mendeleev.periodic.table', category: 'Science', scopes: ['S.3', 'S.4', 'S.5', 'S.6'], status: 'Allowed', summary: 'Science reference app for chemistry classes.', rules: ['Approved for science periods', 'Offline cache retained', 'Pop-up ads disabled'] },
+    { id: 'APP-004', name: 'WhatsApp', packageId: 'com.whatsapp', category: 'Social', scopes: ['All'], status: 'Blocked', summary: 'Blocked during all school-managed sessions.', rules: ['Blocked by default', 'Teacher escalation logs violation', 'No background sync'] },
+    { id: 'APP-005', name: 'TikTok', packageId: 'com.zhiliaoapp.musically', category: 'Social', scopes: ['All'], status: 'Blocked', summary: 'Blocked to keep student devices focused on instruction.', rules: ['Blocked by default', 'Requires admin review to unblock', 'Usage attempts logged'] },
   ];
 
   function escapeHtml(value) {
@@ -1542,18 +1575,42 @@
   function getAppFilters() {
     return {
       query: (document.getElementById('appSearch')?.value || '').trim().toLowerCase(),
-      status: document.getElementById('appStatusFilter')?.value || '',
       category: document.getElementById('appCategoryFilter')?.value || '',
     };
   }
 
+  function getActiveAppItems() {
+    return appRules.filter(app => app.status === activeAppTab);
+  }
+
+  function appIconLabel(name) {
+    return name.split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+  }
+
+  function formatScopes(scopes) {
+    return scopes.map((scope) => `<span class="app-scope-chip">${escapeHtml(scope)}</span>`).join('');
+  }
+
+  function renderScopeCheckboxes(selectedScopes = []) {
+    return APP_CLASSES.map((scope) => `
+      <label class="app-scope-option">
+        <input type="checkbox" name="scopes" value="${escapeHtml(scope)}" ${selectedScopes.includes(scope) ? 'checked' : ''} />
+        ${escapeHtml(scope)}
+      </label>
+    `).join('');
+  }
+
+  function validatePackageId(packageId) {
+    return PACKAGE_ID_PATTERN.test(packageId);
+  }
+
   function updateAppSummary(items) {
-    const allowed = items.filter(app => app.status === 'Allowed').length;
-    const blocked = items.filter(app => app.status === 'Blocked').length;
+    const allowed = appRules.filter(app => app.status === 'Allowed').length;
+    const blocked = appRules.filter(app => app.status === 'Blocked').length;
     const summaryText = document.getElementById('appsSummaryText');
     const allowedCount = document.getElementById('appsAllowedCount');
     const blockedCount = document.getElementById('appsBlockedCount');
-    if (summaryText) summaryText.textContent = `${items.length} app${items.length === 1 ? '' : 's'} shown in student app control`;
+    if (summaryText) summaryText.textContent = `${activeAppTab === 'Allowed' ? 'Whitelisted' : 'Blocked'} apps shown: ${items.length}`;
     if (allowedCount) allowedCount.textContent = `Allowed ${allowed}`;
     if (blockedCount) blockedCount.textContent = `Blocked ${blocked}`;
   }
@@ -1561,26 +1618,33 @@
   function renderAppRules() {
     const tbody = document.getElementById('appsTableBody');
     if (!tbody) return;
-    const { query, status, category } = getAppFilters();
-    const filtered = appRules.filter(app => {
+    const { query, category } = getAppFilters();
+    const filtered = getActiveAppItems().filter(app => {
       const haystack = `${app.name} ${app.packageId} ${app.category} ${app.classes} ${app.status}`.toLowerCase();
       const matchesQuery = !query || haystack.includes(query);
-      const matchesStatus = !status || app.status === status;
       const matchesCategory = !category || app.category === category;
-      return matchesQuery && matchesStatus && matchesCategory;
+      return matchesQuery && matchesCategory;
     });
+
+    const panelTitle = document.querySelector('#page-apps .panel-title');
+    if (panelTitle) panelTitle.textContent = `${activeAppTab === 'Allowed' ? 'Whitelisted' : 'Blocked'} Applications`;
 
     tbody.innerHTML = filtered.length
       ? filtered.map(app => `
         <tr data-app-id="${escapeHtml(app.id)}">
-          <td><strong>${escapeHtml(app.name)}</strong></td>
+          <td>
+            <div class="app-name-cell">
+              <span class="app-icon" aria-hidden="true">${escapeHtml(appIconLabel(app.name))}</span>
+              <div><strong>${escapeHtml(app.name)}</strong></div>
+            </div>
+          </td>
           <td class="device-id">${escapeHtml(app.packageId)}</td>
-          <td>${escapeHtml(app.category)}</td>
-          <td>${escapeHtml(app.classes)}</td>
+          <td><span class="app-category-badge">${escapeHtml(app.category)}</span></td>
+          <td><div class="app-scope-list">${formatScopes(app.scopes)}</div></td>
           <td><span class="pill ${app.status === 'Blocked' ? 'pill-offline' : app.status === 'Review' ? 'pill-warning' : 'pill-online'}">${escapeHtml(app.status)}</span></td>
           <td>
-            <button class="action-btn" type="button" data-app-action="details">Details</button>
-            <button class="action-btn" type="button" data-app-action="toggle">${app.status === 'Blocked' ? 'Edit Rule' : 'Review Rule'}</button>
+            <button class="action-btn" type="button" data-app-action="edit">Edit</button>
+            <button class="action-btn" type="button" data-app-action="remove">Remove</button>
           </td>
         </tr>
       `).join('')
@@ -1615,73 +1679,140 @@
     return backdrop;
   }
 
-  function openAppDetails(appId) {
-    const app = appRules.find(item => item.id === appId);
-    if (!app) return;
-    openAppModal('Application details', `
-      <div class="app-modal__grid">
-        <div class="app-modal__field"><span>Application</span><strong>${escapeHtml(app.name)}</strong></div>
-        <div class="app-modal__field"><span>Package ID</span><strong>${escapeHtml(app.packageId)}</strong></div>
-        <div class="app-modal__field"><span>Category</span><strong>${escapeHtml(app.category)}</strong></div>
-        <div class="app-modal__field"><span>Classes</span><strong>${escapeHtml(app.classes)}</strong></div>
-        <div class="app-modal__field"><span>Status</span><strong>${escapeHtml(app.status)}</strong></div>
-        <div class="app-modal__field"><span>Scope</span><strong>${escapeHtml(app.status === 'Allowed' ? 'Student use' : app.status === 'Blocked' ? 'Restricted' : 'Needs review')}</strong></div>
-      </div>
-      <div class="app-modal__field" style="margin-top:0.9rem;"><span>Summary</span><strong>${escapeHtml(app.summary)}</strong></div>
-      <div style="margin-top:0.9rem;">
-        <span class="app-summary-note">Rule checks</span>
-        <ul class="app-modal__list">
-          ${app.rules.map(rule => `<li>${escapeHtml(rule)}</li>`).join('')}
-        </ul>
-      </div>
-    `);
-  }
-
-  function openAddAppModal() {
-    const backdrop = openAppModal('Add application', `
-      <form class="app-modal__form" id="addAppForm">
+  function openAppFormModal(app = null) {
+    const isEdit = !!app;
+    const modalTitle = isEdit ? 'Edit application' : 'Add application';
+    const initialScopes = app?.scopes || ['All'];
+    const selectedStatus = isEdit ? app.status : activeAppTab;
+    const backdrop = openAppModal(modalTitle, `
+      <form class="app-modal__form" id="appForm" novalidate>
         <div class="field-grid">
-          <label>Application name<input type="text" name="name" required placeholder="Calculator Plus" /></label>
-          <label>Package ID<input type="text" name="packageId" required placeholder="com.example.calculator" /></label>
-          <label>Category<select name="category" required><option>Education</option><option>Maths</option><option>Science</option><option>Browser</option><option>Social</option></select></label>
-          <label>Status<select name="status" required><option>Allowed</option><option>Blocked</option><option>Review</option></select></label>
-          <label>Classes<input type="text" name="classes" required placeholder="S.1–S.6" /></label>
-          <label>Rule summary<input type="text" name="summary" required placeholder="Approved for lesson use" /></label>
+          <label>
+            App name
+            <input type="text" name="name" required placeholder="Calculator Plus" value="${escapeHtml(app?.name || '')}" />
+          </label>
+          <label>
+            Package ID
+            <input type="text" name="packageId" id="appPackageId" required placeholder="org.example.calculator" value="${escapeHtml(app?.packageId || '')}" />
+            <div class="app-modal__hint">Use reverse-domain format, for example <code>org.khanacademy.android</code>.</div>
+            <div class="app-modal__error" data-package-error></div>
+          </label>
+          <label>
+            Category
+            <select name="category" required>
+              ${APP_CATEGORIES.map(category => `<option ${app?.category === category ? 'selected' : ''}>${escapeHtml(category)}</option>`).join('')}
+            </select>
+          </label>
+          <label>
+            Status
+            <input type="text" value="${selectedStatus === 'Allowed' ? 'Whitelisted' : 'Blocked'}" disabled />
+          </label>
         </div>
-        <label>Rule notes<textarea name="rules" placeholder="One rule per line: offline cache only\nteacher override enabled"></textarea></label>
+        <label>
+          Class scope
+          <div class="app-scope-grid" role="group" aria-label="Class scope checkboxes">
+            ${renderScopeCheckboxes(initialScopes)}
+          </div>
+          <div class="app-modal__error" data-scope-error></div>
+        </label>
         <div class="page-header-actions" style="justify-content:flex-end;">
           <button class="btn btn-outline" type="button" data-app-cancel>Cancel</button>
-          <button class="btn btn-primary" type="submit">Save app</button>
+          <button class="btn btn-primary" type="submit">${isEdit ? 'Save changes' : 'Save app'}</button>
         </div>
       </form>
     `);
+
     if (!backdrop) return;
-    const form = backdrop.querySelector('#addAppForm');
+    const form = backdrop.querySelector('#appForm');
+    const packageInput = backdrop.querySelector('#appPackageId');
+    const packageError = backdrop.querySelector('[data-package-error]');
+    const scopeError = backdrop.querySelector('[data-scope-error]');
     const close = () => backdrop.remove();
+
+    const validatePackageField = () => {
+      const valid = validatePackageId(packageInput.value.trim());
+      packageError.textContent = valid ? '' : 'Package ID must match Android reverse-domain format.';
+      packageInput.setAttribute('aria-invalid', valid ? 'false' : 'true');
+      return valid;
+    };
+
     backdrop.querySelector('[data-app-cancel]').addEventListener('click', close);
+    packageInput.addEventListener('input', validatePackageField);
+    validatePackageField();
+
     form.addEventListener('submit', (event) => {
       event.preventDefault();
       const formData = new FormData(form);
-      const nextId = `APP-${String(appRules.length + 1).padStart(3, '0')}`;
-      appRules.unshift({
-        id: nextId,
-        name: String(formData.get('name') || '').trim(),
-        packageId: String(formData.get('packageId') || '').trim(),
+      const scopes = Array.from(form.querySelectorAll('input[name="scopes"]:checked')).map((input) => input.value);
+      const packageId = String(formData.get('packageId') || '').trim();
+      const name = String(formData.get('name') || '').trim();
+
+      if (!name) {
+        scopeError.textContent = '';
+        packageError.textContent = 'App name is required.';
+        return;
+      }
+
+      if (!validatePackageId(packageId)) {
+        validatePackageField();
+        return;
+      }
+
+      if (scopes.length === 0) {
+        packageError.textContent = '';
+        scopeError.textContent = 'Select at least one class scope.';
+        return;
+      }
+
+      const payload = {
+        id: isEdit ? app.id : `APP-${String(appRules.length + 1).padStart(3, '0')}`,
+        name,
+        packageId,
         category: String(formData.get('category') || '').trim(),
-        classes: String(formData.get('classes') || '').trim(),
-        status: String(formData.get('status') || 'Review').trim(),
-        summary: String(formData.get('summary') || '').trim(),
-        rules: String(formData.get('rules') || '').split('\n').map(line => line.trim()).filter(Boolean),
-      });
+        scopes,
+        status: selectedStatus,
+        summary: isEdit ? app.summary : `Managed by the ${selectedStatus === 'Allowed' ? 'whitelist' : 'blocklist'} workflow.`,
+        rules: isEdit ? app.rules : [
+          selectedStatus === 'Allowed' ? 'Approved for student use' : 'Blocked by admin policy',
+          `Class scope: ${scopes.join(', ')}`,
+        ],
+      };
+
+      if (isEdit) {
+        const index = appRules.findIndex((item) => item.id === app.id);
+        if (index !== -1) appRules[index] = payload;
+      } else {
+        appRules.unshift(payload);
+      }
+
       close();
       renderAppRules();
-      showToast('Application rule saved');
+      showToast(isEdit ? `${payload.name} updated` : `${payload.name} added`);
     });
+  }
+
+  function removeApp(appId) {
+    const app = appRules.find((item) => item.id === appId);
+    if (!app) return;
+    const confirmed = window.confirm(`Remove ${app.name} from application control?`);
+    if (!confirmed) return;
+    appRules.splice(appRules.findIndex((item) => item.id === appId), 1);
+    renderAppRules();
+    showToast(`${app.name} removed`);
+  }
+
+  function setActiveAppTab(tab) {
+    activeAppTab = tab;
+    document.querySelectorAll('[data-app-tab]').forEach((button) => {
+      const isActive = button.dataset.appTab === tab;
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+    renderAppRules();
   }
 
   function initAppControl() {
     const search = document.getElementById('appSearch');
-    const statusFilter = document.getElementById('appStatusFilter');
     const categoryFilter = document.getElementById('appCategoryFilter');
     const addButton = document.getElementById('appAddBtn');
     const tbody = document.getElementById('appsTableBody');
@@ -1690,12 +1821,13 @@
 
     renderAppRules();
     search?.addEventListener('input', renderAppRules);
-    statusFilter?.addEventListener('change', renderAppRules);
     categoryFilter?.addEventListener('change', renderAppRules);
 
-    addButton?.addEventListener('click', () => {
-      openAddAppModal();
+    document.querySelectorAll('[data-app-tab]').forEach((button) => {
+      button.addEventListener('click', () => setActiveAppTab(button.dataset.appTab));
     });
+
+    addButton?.addEventListener('click', () => openAppFormModal());
 
     tbody.addEventListener('click', (event) => {
       const button = event.target.closest('button[data-app-action]');
@@ -1705,12 +1837,10 @@
       const app = appRules.find(item => item.id === appId);
       if (!app) return;
 
-      if (button.dataset.appAction === 'details') {
-        openAppDetails(appId);
-        showToast(`${app.name} details opened`);
-      } else {
-        openAppDetails(appId);
-        showToast(`${app.name} rule review opened`);
+      if (button.dataset.appAction === 'edit') {
+        openAppFormModal(app);
+      } else if (button.dataset.appAction === 'remove') {
+        removeApp(appId);
       }
     });
   }
