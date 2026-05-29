@@ -9,7 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" /></noscript>
+  <link rel="stylesheet" href="assets/css/shared.css" />
   <script src="assets/js/lucide-lite.js" defer></script>
+  <script src="assets/js/shared.js" defer></script>
 
   <style>
     /* === CSS CUSTOM PROPERTIES === */
@@ -692,7 +694,7 @@
       </div>
       <div class="sidebar-school" aria-label="Current school">
         <strong id="schoolNameDisplay">Kampala Sec. School</strong>
-        <span>ICT Administrator</span>
+        <span>Super Admin</span>
       </div>
     </div>
 
@@ -1575,11 +1577,6 @@
 </div>
 
 <script>
-  /* === LUCIDE ICON INIT === */
-  document.addEventListener('DOMContentLoaded', () => {
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-  });
-
   /* === SIDEBAR NAVIGATION === */
   const navItems = document.querySelectorAll('.nav-item[data-page]');
   const pages = document.querySelectorAll('.page');

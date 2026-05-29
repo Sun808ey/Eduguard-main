@@ -17,8 +17,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" /></noscript>
+  <link rel="stylesheet" href="assets/css/shared.css" />
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+  <script src="assets/js/shared.js" defer></script>
 
   <style>
     /* === CSS CUSTOM PROPERTIES === */
@@ -763,8 +765,8 @@
           <h4>🎓 Computer Security &amp; Forensics — Final Year Project Context</h4>
           <p>
             EduGuard MDM demonstrates applied security concepts: <strong>access control</strong> (app whitelisting),
-            <strong>policy enforcement</strong> (Android Device Policy Controller), <strong>digital forensics</strong>
-            (immutable audit logs), <strong>cryptographic integrity</strong> (AES-256 signed policy bundles),
+            <strong>policy enforcement</strong> (Android Device Policy Controller, DPC), <strong>digital forensics</strong>
+            (immutable audit logs), <strong>cryptographic integrity</strong> (AES-256 encrypted policy bundles signed with RSA-2048),
             and <strong>resilience engineering</strong> (offline-first sync). This MVP constitutes a fully operational
             Proof of Concept.
           </p>
@@ -784,7 +786,7 @@
             <div class="step-num" aria-hidden="true">01</div>
             <div class="step-icon" aria-hidden="true"><svg data-lucide="settings-2"></svg></div>
             <h3 id="step1-title">Admin Configures Policy</h3>
-            <p>The ICT administrator uses the EduGuard web panel to define per-subject or per-session policies: allowed apps, blocked sites, screen time, and exam lockdown rules. Policies are encrypted and signed before storage.</p>
+            <p>The Super Admin uses the EduGuard web panel to define per-subject or per-session policies: allowed apps, blocked sites, screen time, and exam lockdown rules. Policies are encrypted and signed before storage.</p>
           </article>
           <article class="step-card" role="listitem" aria-labelledby="step2-title">
             <div class="step-num" aria-hidden="true">02</div>
@@ -1004,7 +1006,7 @@
             <div class="fyp-deliverables" role="list">
               <div class="fyp-deliverable" role="listitem"><svg data-lucide="check-circle-2" aria-hidden="true"></svg> Web admin dashboard (HTML/CSS/JS)</div>
               <div class="fyp-deliverable" role="listitem"><svg data-lucide="check-circle-2" aria-hidden="true"></svg> REST API server (Python Flask on Raspberry Pi)</div>
-              <div class="fyp-deliverable" role="listitem"><svg data-lucide="check-circle-2" aria-hidden="true"></svg> Android agent APK (Device Policy Controller)</div>
+              <div class="fyp-deliverable" role="listitem"><svg data-lucide="check-circle-2" aria-hidden="true"></svg> Android agent APK (Device Policy Controller, DPC)</div>
               <div class="fyp-deliverable" role="listitem"><svg data-lucide="check-circle-2" aria-hidden="true"></svg> Offline sync engine with AES-256 bundle signing</div>
               <div class="fyp-deliverable" role="listitem"><svg data-lucide="check-circle-2" aria-hidden="true"></svg> Hash-chained forensic audit log module</div>
               <div class="fyp-deliverable" role="listitem"><svg data-lucide="check-circle-2" aria-hidden="true"></svg> Full technical report and security assessment</div>
@@ -1174,11 +1176,6 @@
   </footer>
 
   <script>
-    /* === LUCIDE ICON INIT === */
-    document.addEventListener('DOMContentLoaded', () => {
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-    });
-
     /* === HAMBURGER MENU === */
     const hamburgerBtn = document.getElementById('hamburgerBtn');
     const mobileNav = document.getElementById('mobileNav');
