@@ -2,8 +2,11 @@
 eduguard-api/
 node_modules/
 venv/
+.venv/
 .env
 *.db
+*.pem
+*.key
 keys/
 certs/
 .vercel
