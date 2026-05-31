@@ -12,8 +12,8 @@ from flask import jsonify, request, g
 from jwt import ExpiredSignatureError, InvalidTokenError
 
 from .audit_chain import append_event
+from .key_material import load_key_material
 from ..db.connection import get_connection
-from api.lib.env import load_key_material
 
 F = TypeVar("F", bound=Callable[..., Any])
 

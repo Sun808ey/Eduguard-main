@@ -15,9 +15,9 @@ from ..core.crypto import (
     unpack_encrypted_bundle,
     verify_bundle_signature,
 )
+from ..core.key_material import load_key_material
 from ..core.rbac import require_role
 from ..db.connection import get_connection
-from api.lib.env import load_key_material
 from .auth import _append_audit_log
 
 policies_bp = Blueprint("policies", __name__, url_prefix="/api/policies")

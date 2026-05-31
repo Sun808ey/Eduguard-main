@@ -5,10 +5,10 @@ from pathlib import Path
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from api.lib.env import load_key_material
 from app.api.auth import _load_jwt_keys
 from app.api.policies import _get_private_key_bytes, _get_public_key_bytes
 from app.core.rbac import _load_public_key
+from app.core.key_material import load_key_material
 
 
 def _generate_rsa_pair() -> tuple[bytes, bytes]:

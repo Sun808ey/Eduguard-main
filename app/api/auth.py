@@ -13,8 +13,8 @@ from flask import Blueprint, jsonify, request
 from jwt import ExpiredSignatureError, InvalidTokenError
 
 from ..core.audit_chain import append_event
+from ..core.key_material import load_key_material
 from ..db.connection import get_connection
-from api.lib.env import load_key_material
 
 ACCESS_TOKEN_TTL_SECONDS = 15 * 60
 REFRESH_TOKEN_TTL_SECONDS = 7 * 24 * 60 * 60
