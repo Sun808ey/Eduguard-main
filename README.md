@@ -50,3 +50,12 @@
 	- `EXTRA_CORS_ORIGINS` for preview/staging only
 
 	For local development, create a `.env.local` file and keep it out of version control. The app loads it only when `VERCEL_ENV` is not set.
+
+## Deployment Workflow
+	1. Activate the virtual environment and install pinned dependencies.
+	2. Run the smoke suite with `python -m pytest tests/ -v`.
+	3. Audit the deployed bundle size with `python scripts/audit_vercel_bundle_size.py --requirements requirements.txt --limit-mb 200`.
+	4. Check the staged diff for accidental secrets before committing.
+	5. Push to `main` so the Vercel GitHub integration deploys automatically.
+
+	The smoke tests verify the `api/index.py` WSGI entrypoint, the `/api/data` health route, and an OPTIONS preflight response without changing any application route logic.
