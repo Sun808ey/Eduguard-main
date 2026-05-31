@@ -280,7 +280,7 @@ def refresh() -> Tuple[Any, int] | Any:
             )
             new_tokens = _issue_tokens(connection, user_id=user_id, role=str(user_row["role"]))
 
-        return jsonify({"access_token": new_tokens["access_token"], "expires_in": ACCESS_TOKEN_TTL_SECONDS}), 200
+        return jsonify({"access_token": new_tokens["access_token"], "refresh_token": new_tokens["refresh_token"], "expires_in": ACCESS_TOKEN_TTL_SECONDS}), 200
     finally:
         connection.close()
 
