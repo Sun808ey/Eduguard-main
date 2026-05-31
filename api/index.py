@@ -108,6 +108,10 @@ def create_app() -> Flask:
     def dashboard_page():
         return _send_frontend_file("dashboard.html")
 
+    @app.get("/dashboard")
+    def dashboard_clean_url():
+        return _send_frontend_file("dashboard.html")
+
     @app.get("/404.html")
     def not_found_page():
         return _send_frontend_file("404.html", 404)

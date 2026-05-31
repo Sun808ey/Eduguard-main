@@ -42,6 +42,17 @@ def test_root_endpoint(monkeypatch):
     assert b"EduGuard MDM" in response.data
 
 
+def test_dashboard_clean_url(monkeypatch):
+    app = _load_app(monkeypatch)
+    client = app.test_client()
+
+    response = client.get("/dashboard")
+
+    assert response.status_code == 200
+    assert response.mimetype == "text/html"
+    assert b"Admin Dashboard" in response.data
+
+
 def test_static_asset_served(monkeypatch):
     app = _load_app(monkeypatch)
     client = app.test_client()
