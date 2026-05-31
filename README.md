@@ -36,3 +36,8 @@
 		2. UPDATE audit_log SET payload_json='{"tampered":true}' WHERE id=1;
 		3. python scripts/verify_audit_chain.py
 		Expected: CHAIN BROKEN at entry ID 1 — proves tamper evidence works
+
+## Vercel Bundle Audit
+	Before each deploy, audit the packaged dependency size to stay comfortably within Vercel's serverless function limits.
+	python scripts/audit_vercel_bundle_size.py --requirements requirements.txt --limit-mb 200
+	Expected: Installed bundle size well under 200M and a top-20 breakdown of the heaviest packages.
