@@ -41,3 +41,12 @@
 	Before each deploy, audit the packaged dependency size to stay comfortably within Vercel's serverless function limits.
 	python scripts/audit_vercel_bundle_size.py --requirements requirements.txt --limit-mb 200
 	Expected: Installed bundle size well under 200M and a top-20 breakdown of the heaviest packages.
+
+## Vercel Environment Variables
+	Set these in the Vercel dashboard or via `vercel env add`:
+	- `FLASK_SECRET_KEY` for Flask session signing
+	- `JWT_SECRET` for token validation
+	- `DATABASE_URL` for the deployed environment config
+	- `EXTRA_CORS_ORIGINS` for preview/staging only
+
+	For local development, create a `.env.local` file and keep it out of version control. The app loads it only when `VERCEL_ENV` is not set.

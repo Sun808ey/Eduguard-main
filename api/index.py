@@ -15,10 +15,14 @@ for path in (API_DIR, ROOT_DIR):
 
 from lib.audit import audit_request  # noqa: E402
 from lib.cors import init_cors, register_preflight_handler  # noqa: E402
+from lib.env import load_local_env, required_env  # noqa: E402
+from lib.errors import register_error_handlers  # noqa: E402
 from lib.auth import auth_bp, require_jwt  # noqa: E402
 from lib.policy import policy_blueprint  # noqa: E402
 from lib.sync import sync_bp  # noqa: E402
 from lib.users import users_bp  # noqa: E402
+
+load_local_env()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -29,9 +33,9 @@ logger = logging.getLogger(__name__)
 
 def create_app() -> Flask:
     app = Flask(__name__)
-    app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY", os.environ.get("SECRET_KEY", ""))
-    app.config["JWT_SECRET"] = os.environ.get("JWT_SECRET", "")
-    app.config["DATABASE_URL"] = os.environ.get("DATABASE_URL", "")
+    app.config["SECRET_KEY"] = required_env("FLASK_SECRET_KEY")
+    app.config["JWT_SECRET"] = required_env("JWT_SECRET")
+    app.config["DATABASE_URL"] = required_env("DATABASE_URL")
     app.config["PROPAGATE_EXCEPTIONS"] = False
 
     app.register_blueprint(auth_bp)
@@ -40,6 +44,7 @@ def create_app() -> Flask:
     app.register_blueprint(users_bp)
     init_cors(app)
     register_preflight_handler(app)
+    register_error_handlers(app)
 
     @app.before_request
     def _audit_request() -> None:
