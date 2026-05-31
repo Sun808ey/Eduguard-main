@@ -38,7 +38,19 @@ def test_root_endpoint(monkeypatch):
     response = client.get("/")
 
     assert response.status_code == 200
-    assert response.get_json() == {"Python": "on Vercel"}
+    assert response.mimetype == "text/html"
+    assert b"EduGuard MDM" in response.data
+
+
+def test_static_asset_served(monkeypatch):
+    app = _load_app(monkeypatch)
+    client = app.test_client()
+
+    response = client.get("/assets/css/shared.css")
+
+    assert response.status_code == 200
+    assert response.mimetype == "text/css"
+    assert b":root" in response.data
 
 
 def test_sample_data_endpoint(monkeypatch):

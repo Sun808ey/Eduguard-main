@@ -3,13 +3,15 @@ from __future__ import annotations
 import logging
 import os
 import sys
+from pathlib import Path
 
-from flask import Flask, jsonify, request
+from flask import Flask, abort, jsonify, request, send_from_directory
+from werkzeug.exceptions import NotFound
 
-API_DIR = os.path.dirname(__file__)
-ROOT_DIR = os.path.dirname(API_DIR)
+API_DIR = Path(__file__).resolve().parent
+ROOT_DIR = API_DIR.parent
 
-for path in (API_DIR, ROOT_DIR):
+for path in (str(API_DIR), str(ROOT_DIR)):
     if path not in sys.path:
         sys.path.insert(0, path)
 
@@ -41,6 +43,32 @@ SAMPLE_DATA_PAYLOAD = {
     "total": 3,
 }
 
+
+def _send_frontend_file(filename: str, status_code: int = 200):
+    response = send_from_directory(str(ROOT_DIR), filename)
+    response.status_code = status_code
+    return response
+
+
+def _serve_frontend_path(requested_path: str):
+    if requested_path.startswith("api/"):
+        abort(404)
+
+    candidate = ROOT_DIR / requested_path
+    if candidate.is_file():
+        return send_from_directory(str(ROOT_DIR), requested_path)
+
+    if candidate.is_dir():
+        index_file = candidate / "index.html"
+        if index_file.is_file():
+            return send_from_directory(str(candidate), "index.html")
+
+    not_found_page = ROOT_DIR / "404.html"
+    if not_found_page.is_file():
+        return _send_frontend_file("404.html", 404)
+
+    return jsonify({"error": "resource not found"}), 404
+
 def create_app() -> Flask:
     app = Flask(__name__)
     app.config["SECRET_KEY"] = required_env("FLASK_SECRET_KEY")
@@ -62,7 +90,27 @@ def create_app() -> Flask:
 
     @app.get("/")
     def root():
-        return jsonify({"Python": "on Vercel"}), 200
+        return _send_frontend_file("index.html")
+
+    @app.get("/index.html")
+    def legacy_index():
+        return _send_frontend_file("index.html")
+
+    @app.get("/dashboard.html")
+    def dashboard_page():
+        return _send_frontend_file("dashboard.html")
+
+    @app.get("/404.html")
+    def not_found_page():
+        return _send_frontend_file("404.html", 404)
+
+    @app.get("/assets/<path:asset_path>")
+    def assets(asset_path: str):
+        return send_from_directory(str(ROOT_DIR / "assets"), asset_path)
+
+    @app.get("/<path:requested_path>")
+    def frontend_or_static(requested_path: str):
+        return _serve_frontend_path(requested_path)
 
     @app.get("/api/health")
     @app.get("/api/data")

@@ -15,12 +15,8 @@
       "dest": "api/index.py"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "api/index.py"
     }
   ],
   "headers": [
