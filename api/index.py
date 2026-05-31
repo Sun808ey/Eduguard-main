@@ -10,6 +10,7 @@ from werkzeug.exceptions import NotFound
 
 API_DIR = Path(__file__).resolve().parent
 ROOT_DIR = API_DIR.parent
+MDM_DIR = ROOT_DIR / "eduguard-mdm"
 
 for path in (str(API_DIR), str(ROOT_DIR)):
     if path not in sys.path:
@@ -58,21 +59,27 @@ def _send_frontend_file(filename: str, status_code: int = 200):
     return response
 
 
+def _send_frontend_file_from(directory: Path, filename: str, status_code: int = 200):
+    response = send_from_directory(str(directory), filename)
+    response.status_code = status_code
+    return response
+
+
 def _serve_frontend_path(requested_path: str):
     if requested_path.startswith("api/"):
         abort(404)
 
-    candidate = ROOT_DIR / requested_path
-    if candidate.is_file():
-        return send_from_directory(str(ROOT_DIR), requested_path)
+    for directory in (ROOT_DIR, MDM_DIR):
+        candidate = directory / requested_path
+        if candidate.is_file():
+            return send_from_directory(str(directory), requested_path)
 
-    if candidate.is_dir():
-        index_file = candidate / "index.html"
-        if index_file.is_file():
-            return send_from_directory(str(candidate), "index.html")
+        if candidate.is_dir():
+            index_file = candidate / "index.html"
+            if index_file.is_file():
+                return send_from_directory(str(candidate), "index.html")
 
-    not_found_page = ROOT_DIR / "404.html"
-    if not_found_page.is_file():
+    if (ROOT_DIR / "404.html").is_file():
         return _send_frontend_file("404.html", 404)
 
     return jsonify({"error": "resource not found"}), 404
@@ -112,13 +119,22 @@ def create_app() -> Flask:
     def dashboard_clean_url():
         return _send_frontend_file("dashboard.html")
 
+    @app.get("/login.html")
+    @app.get("/login")
+    def login_page():
+        return _send_frontend_file_from(MDM_DIR, "login.html")
+
     @app.get("/404.html")
     def not_found_page():
         return _send_frontend_file("404.html", 404)
 
     @app.get("/assets/<path:asset_path>")
     def assets(asset_path: str):
-        return send_from_directory(str(ROOT_DIR / "assets"), asset_path)
+        for directory in (ROOT_DIR / "assets", MDM_DIR / "assets"):
+            candidate = directory / asset_path
+            if candidate.is_file():
+                return send_from_directory(str(directory), asset_path)
+        abort(404)
 
     @app.get("/<path:requested_path>")
     def frontend_or_static(requested_path: str):
