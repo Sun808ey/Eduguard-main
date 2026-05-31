@@ -14,6 +14,7 @@ for path in (API_DIR, ROOT_DIR):
         sys.path.insert(0, path)
 
 from lib.audit import audit_request  # noqa: E402
+from lib.cors import init_cors, register_preflight_handler  # noqa: E402
 from lib.auth import auth_bp, require_jwt  # noqa: E402
 from lib.policy import policy_blueprint  # noqa: E402
 from lib.sync import sync_bp  # noqa: E402
@@ -26,13 +27,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-ALLOWED_ORIGINS = {
-    "https://eduguard-main.vercel.app",
-    "http://localhost:3000",
-    "http://localhost:5173",
-}
-
-
 def create_app() -> Flask:
     app = Flask(__name__)
     app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY", os.environ.get("SECRET_KEY", ""))
@@ -44,22 +38,12 @@ def create_app() -> Flask:
     app.register_blueprint(policy_blueprint)
     app.register_blueprint(sync_bp)
     app.register_blueprint(users_bp)
+    init_cors(app)
+    register_preflight_handler(app)
 
     @app.before_request
     def _audit_request() -> None:
         audit_request()
-
-    @app.after_request
-    def _apply_cors_headers(response):
-        origin = request.headers.get("Origin", "")
-        if origin in ALLOWED_ORIGINS:
-            response.headers["Access-Control-Allow-Origin"] = origin
-            response.headers["Access-Control-Allow-Credentials"] = "true"
-            response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-            response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Request-ID"
-            response.headers["Access-Control-Max-Age"] = "600"
-            response.headers["Vary"] = "Origin"
-        return response
 
     @app.get("/api/health")
     @app.get("/api/data")
