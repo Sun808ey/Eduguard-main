@@ -47,9 +47,11 @@
 	- `FLASK_SECRET_KEY` for Flask session signing
 	- `JWT_SECRET` for token validation
 	- `DATABASE_URL` for the deployed environment config
+	- `JWT_PRIVATE_KEY_PEM` for signing access and refresh tokens
+	- `JWT_PUBLIC_KEY_PEM` for verifying access, refresh, and policy signatures
 	- `EXTRA_CORS_ORIGINS` for preview/staging only
 
-	For local development, create a `.env.local` file and keep it out of version control. The app loads it only when `VERCEL_ENV` is not set.
+	For local development, you can keep using `JWT_PRIVATE_KEY_PATH` and `JWT_PUBLIC_KEY_PATH` with generated PEM files on disk. The app loads `.env.local` only when `VERCEL_ENV` is not set.
 
 ## Deployment Workflow
 	1. Activate the virtual environment and install pinned dependencies.

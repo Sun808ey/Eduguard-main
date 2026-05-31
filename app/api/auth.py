@@ -5,7 +5,6 @@ import json
 import sqlite3
 import uuid
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
 import bcrypt
@@ -15,12 +14,15 @@ from jwt import ExpiredSignatureError, InvalidTokenError
 
 from ..core.audit_chain import append_event
 from ..db.connection import get_connection
+from api.lib.env import load_key_material
 
 ACCESS_TOKEN_TTL_SECONDS = 15 * 60
 REFRESH_TOKEN_TTL_SECONDS = 7 * 24 * 60 * 60
 
 PRIVATE_KEY_ENV = "JWT_PRIVATE_KEY_PATH"
 PUBLIC_KEY_ENV = "JWT_PUBLIC_KEY_PATH"
+PRIVATE_KEY_PEM_ENV = "JWT_PRIVATE_KEY_PEM"
+PUBLIC_KEY_PEM_ENV = "JWT_PUBLIC_KEY_PEM"
 
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
@@ -30,23 +32,10 @@ def _utc_now() -> datetime:
     return datetime.now(timezone.utc)
 
 
-def _read_key_file(path: Path) -> str:
-    return path.read_text(encoding="utf-8")
-
-
-def _resolve_key_paths() -> Tuple[Path, Path]:
-    import os
-
-    private_path = Path(os.environ.get(PRIVATE_KEY_ENV, "keys/server_private.pem"))
-    public_path = Path(os.environ.get(PUBLIC_KEY_ENV, "keys/server_public.pem"))
-    return private_path, public_path
-
-
 def _load_jwt_keys() -> Tuple[str, str]:
-    private_path, public_path = _resolve_key_paths()
-    private_key = _read_key_file(private_path)
-    public_key = _read_key_file(public_path)
-    return private_key, public_key
+    private_key = load_key_material(PRIVATE_KEY_PEM_ENV, PRIVATE_KEY_ENV, "keys/server_private.pem")
+    public_key = load_key_material(PUBLIC_KEY_PEM_ENV, PUBLIC_KEY_ENV, "keys/server_public.pem")
+    return private_key.decode("utf-8"), public_key.decode("utf-8")
 
 
 def _hash_token(token: str) -> str:

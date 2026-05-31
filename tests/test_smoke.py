@@ -81,3 +81,17 @@ def test_preflight_response(monkeypatch):
 
     assert response.status_code in {200, 204}
     assert response.headers["Access-Control-Allow-Origin"] == "http://localhost:5173"
+
+
+def test_boots_without_backend_env_vars(monkeypatch):
+    monkeypatch.delenv("FLASK_SECRET_KEY", raising=False)
+    monkeypatch.delenv("JWT_SECRET", raising=False)
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+
+    app = _load_app(monkeypatch)
+    client = app.test_client()
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert response.mimetype == "text/html"

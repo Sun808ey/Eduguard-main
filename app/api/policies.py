@@ -17,27 +17,27 @@ from ..core.crypto import (
 )
 from ..core.rbac import require_role
 from ..db.connection import get_connection
+from api.lib.env import load_key_material
 from .auth import _append_audit_log
 
 policies_bp = Blueprint("policies", __name__, url_prefix="/api/policies")
 
 PRIVATE_KEY_ENV = "JWT_PRIVATE_KEY_PATH"
 PUBLIC_KEY_ENV = "JWT_PUBLIC_KEY_PATH"
+PRIVATE_KEY_PEM_ENV = "JWT_PRIVATE_KEY_PEM"
+PUBLIC_KEY_PEM_ENV = "JWT_PUBLIC_KEY_PEM"
 
 
-def _load_key_bytes(env_var: str, default_path: str) -> bytes:
-    import os
-
-    key_path = Path(os.environ.get(env_var, default_path))
-    return key_path.read_bytes()
+def _load_key_bytes(pem_env: str, path_env: str, default_path: str) -> bytes:
+    return load_key_material(pem_env, path_env, default_path)
 
 
 def _get_private_key_bytes() -> bytes:
-    return _load_key_bytes(PRIVATE_KEY_ENV, "keys/server_private.pem")
+    return _load_key_bytes(PRIVATE_KEY_PEM_ENV, PRIVATE_KEY_ENV, "keys/server_private.pem")
 
 
 def _get_public_key_bytes() -> bytes:
-    return _load_key_bytes(PUBLIC_KEY_ENV, "keys/server_public.pem")
+    return _load_key_bytes(PUBLIC_KEY_PEM_ENV, PUBLIC_KEY_ENV, "keys/server_public.pem")
 
 
 def _row_to_policy(row) -> dict:

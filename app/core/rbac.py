@@ -2,11 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import sqlite3
 from datetime import datetime, timezone
 from functools import wraps
-from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Optional, Tuple, TypeVar
 
 import jwt
@@ -15,6 +13,7 @@ from jwt import ExpiredSignatureError, InvalidTokenError
 
 from .audit_chain import append_event
 from ..db.connection import get_connection
+from api.lib.env import load_key_material
 
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -25,6 +24,7 @@ ROLE_HIERARCHY = {
 }
 
 PUBLIC_KEY_ENV = "JWT_PUBLIC_KEY_PATH"
+PUBLIC_KEY_PEM_ENV = "JWT_PUBLIC_KEY_PEM"
 
 audit_event_type = "UNAUTHORIZED_ACCESS"
 
@@ -41,12 +41,8 @@ def _hash_token(token: str) -> str:
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 
-def _resolve_public_key_path() -> Path:
-    return Path(os.environ.get(PUBLIC_KEY_ENV, "keys/server_public.pem"))
-
-
 def _load_public_key() -> str:
-    return _resolve_public_key_path().read_text(encoding="utf-8")
+    return load_key_material(PUBLIC_KEY_PEM_ENV, PUBLIC_KEY_ENV, "keys/server_public.pem").decode("utf-8")
 
 
 def _append_audit_log(

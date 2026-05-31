@@ -44,6 +44,14 @@ SAMPLE_DATA_PAYLOAD = {
 }
 
 
+def _runtime_env(name: str, fallback: str = "") -> str:
+    value = os.environ.get(name)
+    if value is None:
+        logger.warning("Missing %s; using fallback value for local/bootstrap-only execution.", name)
+        return fallback
+    return value
+
+
 def _send_frontend_file(filename: str, status_code: int = 200):
     response = send_from_directory(str(ROOT_DIR), filename)
     response.status_code = status_code
@@ -71,9 +79,9 @@ def _serve_frontend_path(requested_path: str):
 
 def create_app() -> Flask:
     app = Flask(__name__)
-    app.config["SECRET_KEY"] = required_env("FLASK_SECRET_KEY")
-    app.config["JWT_SECRET"] = required_env("JWT_SECRET")
-    app.config["DATABASE_URL"] = required_env("DATABASE_URL")
+    app.config["SECRET_KEY"] = _runtime_env("FLASK_SECRET_KEY", "dev-bootstrap-secret")
+    app.config["JWT_SECRET"] = _runtime_env("JWT_SECRET")
+    app.config["DATABASE_URL"] = _runtime_env("DATABASE_URL")
     app.config["PROPAGATE_EXCEPTIONS"] = False
 
     app.register_blueprint(auth_bp)
