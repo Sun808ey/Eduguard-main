@@ -31,6 +31,16 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+SAMPLE_DATA_PAYLOAD = {
+    "data": [
+        {"id": 1, "name": "Sample Item 1", "value": 100},
+        {"id": 2, "name": "Sample Item 2", "value": 200},
+        {"id": 3, "name": "Sample Item 3", "value": 300},
+    ],
+    "timestamp": "2024-01-01T00:00:00Z",
+    "total": 3,
+}
+
 def create_app() -> Flask:
     app = Flask(__name__)
     app.config["SECRET_KEY"] = required_env("FLASK_SECRET_KEY")
@@ -50,6 +60,10 @@ def create_app() -> Flask:
     def _audit_request() -> None:
         audit_request()
 
+    @app.get("/")
+    def root():
+        return jsonify({"Python": "on Vercel"}), 200
+
     @app.get("/api/health")
     @app.get("/api/data")
     def health_check():
@@ -64,6 +78,10 @@ def create_app() -> Flask:
             ),
             200,
         )
+
+    @app.get("/api/sample-data")
+    def sample_data():
+        return jsonify(SAMPLE_DATA_PAYLOAD), 200
 
     @app.errorhandler(404)
     def not_found(_error):

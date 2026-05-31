@@ -31,6 +31,30 @@ def test_health_endpoint(monkeypatch):
     assert payload["status"] == "ok"
 
 
+def test_root_endpoint(monkeypatch):
+    app = _load_app(monkeypatch)
+    client = app.test_client()
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert response.get_json() == {"Python": "on Vercel"}
+
+
+def test_sample_data_endpoint(monkeypatch):
+    app = _load_app(monkeypatch)
+    client = app.test_client()
+
+    response = client.get("/api/sample-data")
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["total"] == 3
+    assert payload["timestamp"] == "2024-01-01T00:00:00Z"
+    assert len(payload["data"]) == 3
+    assert payload["data"][0]["name"] == "Sample Item 1"
+
+
 def test_preflight_response(monkeypatch):
     app = _load_app(monkeypatch)
     client = app.test_client()
