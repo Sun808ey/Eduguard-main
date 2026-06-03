@@ -10,7 +10,7 @@ from werkzeug.exceptions import NotFound
 
 API_DIR = Path(__file__).resolve().parent
 ROOT_DIR = API_DIR.parent
-MDM_DIR = ROOT_DIR / "eduguard-mdm"
+SYSTEM_DIR = ROOT_DIR / "eduguard-mdm"
 
 for path in (str(API_DIR), str(ROOT_DIR)):
     if path not in sys.path:
@@ -69,7 +69,7 @@ def _serve_frontend_path(requested_path: str):
     if requested_path.startswith("api/"):
         abort(404)
 
-    for directory in (ROOT_DIR, MDM_DIR):
+    for directory in (ROOT_DIR, SYSTEM_DIR):
         candidate = directory / requested_path
         if candidate.is_file():
             return send_from_directory(str(directory), requested_path)
@@ -122,7 +122,7 @@ def create_app() -> Flask:
     @app.get("/login.html")
     @app.get("/login")
     def login_page():
-        return _send_frontend_file_from(MDM_DIR, "login.html")
+        return _send_frontend_file_from(SYSTEM_DIR, "login.html")
 
     @app.get("/404.html")
     def not_found_page():
@@ -130,7 +130,7 @@ def create_app() -> Flask:
 
     @app.get("/assets/<path:asset_path>")
     def assets(asset_path: str):
-        for directory in (ROOT_DIR / "assets", MDM_DIR / "assets"):
+        for directory in (ROOT_DIR / "assets", SYSTEM_DIR / "assets"):
             candidate = directory / asset_path
             if candidate.is_file():
                 return send_from_directory(str(directory), asset_path)

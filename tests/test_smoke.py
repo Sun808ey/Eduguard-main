@@ -39,7 +39,7 @@ def test_root_endpoint(monkeypatch):
 
     assert response.status_code == 200
     assert response.mimetype == "text/html"
-    assert b"EduGuard MDM" in response.data
+    assert b"EduGuard system" in response.data
 
 
 def test_login_page(monkeypatch):
