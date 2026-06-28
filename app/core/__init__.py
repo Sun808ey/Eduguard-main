@@ -1,5 +1,6 @@
 """Core security utilities for EduGuard."""
 
+from .config import AppSettings, load_settings
 from .crypto import (
 	decrypt_policy_bundle,
 	encrypt_policy_bundle,
@@ -20,4 +21,6 @@ __all__ = [
 	"verify_sync_signature",
 	"sign_bundle",
 	"verify_bundle_signature",
+	"AppSettings",
+	"load_settings",
 ]

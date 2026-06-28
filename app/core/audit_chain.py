@@ -29,7 +29,13 @@ def _compute_event_hash(
     return hashlib.sha256(material.encode("utf-8")).hexdigest()
 
 
-def append_event(conn: sqlite3.Connection, event_type: str, device_id: str, user_id: str, payload: dict) -> str:
+def append_event(
+    conn: sqlite3.Connection,
+    event_type: str,
+    device_id: Optional[str],
+    user_id: Optional[str],
+    payload: dict,
+) -> str:
     """
     FORENSIC ANNOTATION: Hash-chain construction
     Each entry: SHA-256( prev_hash || timestamp || event_type || device_id || payload_json )

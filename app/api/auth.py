@@ -57,8 +57,8 @@ def _append_audit_log(
     append_event(
         connection,
         event_type=event_type,
-        device_id="" if device_id is None else str(device_id),
-        user_id="" if user_id is None else str(user_id),
+        device_id=None if device_id is None else str(device_id),
+        user_id=None if user_id is None else str(user_id),
         payload=payload,
     )
 

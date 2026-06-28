@@ -164,7 +164,7 @@ def _append_device_event(connection, device_id: int, event: Dict[str, Any]) -> N
     # FORENSIC ANNOTATION: DEVICE WINS for audit events means every tablet-originated event is appended to the chain.
     event_type = str(event.get("event_type", "DEVICE_EVENT"))
     payload = {"event": event, "source": "device"}
-    append_event(connection, event_type=event_type, device_id=str(device_id), user_id="", payload=payload)
+    append_event(connection, event_type=event_type, device_id=str(device_id), user_id=None, payload=payload)
 
 
 def process_push_payload(payload: Dict[str, Any], hmac_sig: str) -> Tuple[Dict[str, Any], int]:
