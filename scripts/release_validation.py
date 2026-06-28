@@ -17,6 +17,7 @@ def main() -> int:
     python_executable = sys.executable
 
     checks = [
+        [python_executable, "scripts/check_database_integrity.py"],
         [python_executable, "-m", "pytest", "tests/test_core_security.py", "tests/test_smoke.py", "tests/test_key_loading.py"],
         [python_executable, "scripts/verify_audit_chain.py"],
     ]
