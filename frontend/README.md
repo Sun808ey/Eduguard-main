@@ -1,13 +1,13 @@
-# EduGuard system — Frontend (eduguard-mdm)
+# EduGuard system — Frontend
 
-This repository is the frontend for the EduGuard system proof-of-concept MVP.
+This folder contains the frontend for the EduGuard system proof-of-concept MVP.
 
 In production, the app is meant to be deployed to Vercel and pointed at the Flask backend with `VITE_API_BASE_URL`. The dashboard keeps working offline by falling back to seeded data if the backend cannot be reached.
 
 To run the frontend together with the audit API in local development, start the backend on the LAN, then run the React app:
 
 ```powershell
-cd "c:\Users\SUN\Downloads\Compressed\Eduguard-main\Eduguard-main\eduguard-mdm"
+cd "c:\Users\SUN\Downloads\Compressed\Eduguard-main\Eduguard-main\frontend"
 npm install
 npm run dev
 ```
