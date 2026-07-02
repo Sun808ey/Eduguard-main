@@ -1,0 +1,100 @@
+<!--
+  Component snippets for EduGuard system (accessible examples)
+  These are for development and documentation only.
+-->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Component Snippets</title>
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+  </head>
+  <body style="padding:1rem;background:var(--ui-bg);color:var(--ui-muted)">
+    <h2 style="color:var(--ui-accent)">Badges</h2>
+    <div style="display:flex;gap:0.5rem;align-items:center">
+      <span class="badge badge--online" role="status" aria-label="Online">Online</span>
+      <span class="badge badge--offline" role="status" aria-label="Offline">Offline</span>
+      <span class="badge badge--syncing" role="status" aria-label="Syncing">Syncing</span>
+      <span class="badge badge--pending" role="status" aria-label="Pending">Pending</span>
+    </div>
+
+    <h2 style="color:var(--ui-accent);margin-top:1rem">Data Card</h2>
+    <div class="card card--stat" style="max-width:420px">
+      <div class="card__left">
+        <div class="card__icon" aria-hidden="true">📱</div>
+        <div>
+          <div class="card__stat">47</div>
+          <div class="card__label">Total Enrolled</div>
+        </div>
+      </div>
+      <div class="trend trend--up" aria-hidden="true">▲ 4%</div>
+    </div>
+
+    <h2 style="color:var(--ui-accent);margin-top:1rem">Policy Card</h2>
+    <div class="policy-card" style="max-width:420px">
+      <div class="policy-card__header">
+        <div>
+          <div class="policy-card__title">Exam Kiosk</div>
+          <div class="policy-card__meta">Scope: S.3 — Exam period</div>
+        </div>
+        <div class="encryption-badge" title="AES-256 enforced">AES-256</div>
+      </div>
+      <div class="policy-card__tags">
+        <span class="chip">App Whitelist</span>
+        <span class="chip">Schedule: 08:00-12:00</span>
+      </div>
+    </div>
+
+    <h2 style="color:var(--ui-accent);margin-top:1rem">Audit Row</h2>
+    <div class="audit-row" role="listitem">
+      <div style="flex:1">Policy applied to device ITEL-A32</div>
+      <div class="hash" title="a3f9c1d9b6e8f4c2d1e0a9f8b7c6d5e4a3b2c1d0">a3f9c1d9…</div>
+      <div style="width:120px;text-align:right;color:var(--ui-muted)">2 min ago</div>
+    </div>
+
+    <h2 style="color:var(--ui-accent);margin-top:1rem">Device Row / Battery</h2>
+    <div class="device-row" style="max-width:820px;align-items:center">
+      <div class="device__model">Tecno Spark 7 — A21</div>
+      <div class="chip">S.2</div>
+      <div><span class="badge badge--online">Online</span></div>
+      <div><span class="compliance-compliant">Compliant</span></div>
+      <div>
+        <div class="battery" aria-hidden="true"><div class="battery__fill" style="width:62%"></div></div>
+      </div>
+      <div style="display:flex;gap:0.35rem">
+        <button class="btn btn-ghost">View</button>
+        <button class="btn btn-danger">Wipe</button>
+      </div>
+    </div>
+
+    <h2 style="color:var(--ui-accent);margin-top:1rem">Modal (example markup)</h2>
+    <div style="max-width:420px">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
+        <div class="modal__header">
+          <h3 id="m-title">Device Details</h3>
+          <button class="modal-close" aria-label="Close">✕</button>
+        </div>
+        <div class="modal__body">
+          <p style="color:var(--ui-muted)">Device ID: ITEL-A32<br>Last sync: 2 min ago</p>
+        </div>
+      </div>
+    </div>
+
+    <h2 style="color:var(--ui-accent);margin-top:1rem">Toast (sample)</h2>
+    <div class="toast-container" aria-live="polite">
+      <div class="toast toast--success" role="status">
+        <div class="toast__title">Saved</div>
+        <div style="flex:1;color:var(--ui-muted);font-size:0.9rem">Security settings updated</div>
+      </div>
+    </div>
+
+    <h2 style="color:var(--ui-accent);margin-top:1rem">Skeletons</h2>
+    <div style="max-width:420px">
+      <div class="skeleton skeleton--avatar" aria-hidden="true"></div>
+      <div class="skeleton skeleton--text" aria-hidden="true"></div>
+      <div class="skeleton skeleton--text" style="width:60%" aria-hidden="true"></div>
+    </div>
+  </body>
+</html>

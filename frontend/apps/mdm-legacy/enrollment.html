@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="EduGuard system QR enrollment wizard for school-owned Android devices." />
+    <meta name="theme-color" content="#07111A" />
+    <title>EduGuard system — Enrollment</title>
+    <link rel="icon" href="assets/img/favicon.ico" />
+    <link rel="stylesheet" href="assets/css/base.css" />
+    <link rel="stylesheet" href="assets/css/components.css" />
+    <link rel="stylesheet" href="assets/css/layout.css" />
+    <link rel="stylesheet" href="assets/css/animations.css" />
+    <style>
+      .enrollment-page {
+        background:
+          radial-gradient(circle at top left, rgba(6, 214, 160, 0.12), transparent 34%),
+          radial-gradient(circle at bottom right, rgba(35, 110, 255, 0.12), transparent 30%),
+          var(--ui-bg);
+        color: var(--ui-text);
+        min-height: 100vh;
+      }
+      .enrollment-shell {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 2rem 1rem 3rem;
+      }
+      .enrollment-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .enrollment-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: inherit;
+        text-decoration: none;
+      }
+      .enrollment-brand img { width: 40px; height: 40px; }
+      .enrollment-brand strong { display: block; line-height: 1.1; }
+      .enrollment-brand span { color: var(--ui-muted); font-size: 0.88rem; }
+      .enrollment-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+        gap: 1.25rem;
+        align-items: start;
+      }
+      .enrollment-panel {
+        background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 24px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+      }
+      .enrollment-panel__header {
+        padding: 1.25rem 1.25rem 0;
+      }
+      .enrollment-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.25rem 0.7rem;
+        border-radius: 999px;
+        background: rgba(6,214,160,0.08);
+        color: var(--ui-accent);
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .enrollment-panel h1 {
+        margin: 0.8rem 0 0.6rem;
+        font-size: clamp(2rem, 4vw, 3.4rem);
+        line-height: 1.04;
+      }
+      .enrollment-panel__lead {
+        margin: 0;
+        color: var(--ui-muted);
+        max-width: 60ch;
+      }
+      .enrollment-content {
+        padding: 1.25rem;
+        display: grid;
+        gap: 1rem;
+      }
+      .wizard-steps {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.75rem;
+      }
+      .wizard-step {
+        padding: 0.95rem;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.06);
+        background: rgba(255,255,255,0.02);
+      }
+      .wizard-step.is-active {
+        border-color: rgba(6,214,160,0.35);
+        background: rgba(6,214,160,0.06);
+      }
+      .wizard-step__num {
+        display: inline-flex;
+        width: 2rem;
+        height: 2rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.04);
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+      }
+      .wizard-step h2 {
+        margin: 0 0 0.35rem;
+        font-size: 1.05rem;
+      }
+      .wizard-step p { margin: 0; color: var(--ui-muted); font-size: 0.9rem; }
+      .wizard-stage {
+        padding: 1.1rem;
+        border-radius: 20px;
+        background: rgba(6, 10, 18, 0.62);
+        border: 1px solid rgba(255,255,255,0.06);
+      }
+      .wizard-stage__title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+      .wizard-stage__title h2 { margin: 0; font-size: 1.25rem; }
+      .wizard-stage__title p { margin: 0.25rem 0 0; color: var(--ui-muted); }
+      .wizard-form {
+        display: grid;
+        gap: 0.9rem;
+      }
+      .field label {
+        display: block;
+        margin-bottom: 0.35rem;
+        font-weight: 700;
+        font-size: 0.88rem;
+      }
+      .field input,
+      .field select {
+        width: 100%;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 14px;
+        background: rgba(255,255,255,0.03);
+        color: inherit;
+        padding: 0.85rem 0.95rem;
+        outline: none;
+      }
+      .field input:focus,
+      .field select:focus {
+        border-color: rgba(6,214,160,0.5);
+        box-shadow: 0 0 0 3px rgba(6,214,160,0.12);
+      }
+      .field small,
+      .helper-text { color: var(--ui-muted); }
+      .helper-text { font-size: 0.85rem; }
+      .field-error {
+        min-height: 1rem;
+        margin-top: 0.35rem;
+        color: var(--ui-danger);
+        font-size: 0.82rem;
+      }
+      .step-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 0.35rem;
+      }
+      .qr-wrap {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+        align-items: start;
+      }
+      .qr-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 20px;
+        padding: 1rem;
+      }
+      .qr-card__frame {
+        aspect-ratio: 1 / 1;
+        display: grid;
+        place-items: center;
+        background: #fff;
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .qr-meta {
+        display: grid;
+        gap: 0.65rem;
+      }
+      .qr-meta code {
+        display: block;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.82rem;
+        padding: 0.85rem;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.04);
+      }
+      .countdown {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-weight: 700;
+        color: var(--ui-accent);
+      }
+      .pending-list {
+        display: grid;
+        gap: 0.75rem;
+      }
+      .pending-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.9rem 1rem;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.06);
+        background: rgba(255,255,255,0.03);
+      }
+      .pending-item strong { display: block; margin-bottom: 0.1rem; }
+      .pending-item span { color: var(--ui-muted); font-size: 0.85rem; }
+      .note-box {
+        padding: 0.8rem 0.95rem;
+        border-radius: 14px;
+        background: rgba(245, 166, 35, 0.08);
+        border: 1px solid rgba(245, 166, 35, 0.18);
+        color: #ffd58f;
+        font-size: 0.9rem;
+      }
+      .wizard-toast {
+        position: fixed;
+        right: 1rem;
+        top: 1rem;
+        z-index: 50;
+        display: grid;
+        gap: 0.5rem;
+      }
+      .wizard-toast .toast {
+        background: var(--ui-surface);
+        border-radius: 12px;
+        padding: 0.75rem 0.95rem;
+        box-shadow: var(--shadow-lg);
+        border-left: 4px solid var(--ui-accent);
+      }
+      .hidden { display: none !important; }
+      @media (max-width: 920px) {
+        .enrollment-hero,
+        .qr-wrap,
+        .wizard-steps { grid-template-columns: 1fr; }
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+    <script src="assets/js/enrollment.js" defer></script>
+  </head>
+  <body class="enrollment-page">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="wizard-toast" id="toastRoot" aria-live="polite" aria-atomic="true"></div>
+
+    <main class="enrollment-shell" id="main-content">
+      <div class="enrollment-topbar">
+        <a class="enrollment-brand" href="index.html" aria-label="EduGuard system home">
+          <img src="assets/img/logo.svg" alt="EduGuard system" />
+          <span>
+            <strong>EduGuard</strong>
+            <small>Enrollment wizard</small>
+          </span>
+        </a>
+        <a class="btn btn-outline" href="dashboard.html">Back to dashboard</a>
+      </div>
+
+      <section class="enrollment-panel" aria-labelledby="enrollmentTitle">
+        <div class="enrollment-panel__header">
+          <span class="enrollment-eyebrow">Step 15 · QR Enrollment</span>
+          <h1 id="enrollmentTitle">Enroll a device with a single-use QR code.</h1>
+          <p class="enrollment-panel__lead">
+            The wizard binds a school device class group and admin passcode to a short-lived signed token so the device can appear in the pending list after confirmation.
+          </p>
+        </div>
+
+        <div class="enrollment-content">
+          <div class="wizard-steps" aria-label="Enrollment steps">
+            <article class="wizard-step is-active" data-step-card="1">
+              <span class="wizard-step__num">1</span>
+              <h2>Enter details</h2>
+              <p>Choose the device class group and enter the admin passcode.</p>
+            </article>
+            <article class="wizard-step" data-step-card="2">
+              <span class="wizard-step__num">2</span>
+              <h2>Scan QR</h2>
+              <p>Generate a signed token and display it as a QR code for the device.</p>
+            </article>
+            <article class="wizard-step" data-step-card="3">
+              <span class="wizard-step__num">3</span>
+              <h2>Confirm</h2>
+              <p>Finish enrollment and add the device to the pending list.</p>
+            </article>
+          </div>
+
+          <section class="wizard-stage" id="wizardStage">
+            <div class="wizard-stage__title">
+              <div>
+                <h2 id="stageTitle">Step 1: Device details</h2>
+                <p id="stageCopy">Enter the device class group and the admin passcode to generate a QR enrollment token.</p>
+              </div>
+              <div class="countdown" id="countdownWrap">Expires in <span id="countdownValue">60s</span></div>
+            </div>
+
+            <div class="wizard-form" id="stepOneForm">
+              <div class="field">
+                <label for="classGroup">Device class group</label>
+                <select id="classGroup">
+                  <option value="S.1 Science">S.1 Science</option>
+                  <option value="S.2 Arts">S.2 Arts</option>
+                  <option value="S.3 Commerce">S.3 Commerce</option>
+                  <option value="S.4 Science">S.4 Science</option>
+                  <option value="S.5 PCM">S.5 PCM</option>
+                  <option value="S.6 HGE">S.6 HGE</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="adminPasscode">Admin passcode</label>
+                <input id="adminPasscode" type="password" autocomplete="current-password" placeholder="Enter admin passcode" />
+                <div class="field-error" id="formError"></div>
+              </div>
+              <div class="step-actions">
+                <button class="btn btn-primary" id="generateButton" type="button">Generate QR Code</button>
+              </div>
+            </div>
+
+            <div class="qr-wrap hidden" id="qrStep">
+              <div class="qr-card">
+                <div class="qr-card__frame" id="qrCode" aria-label="Generated QR code"></div>
+              </div>
+              <div class="qr-meta">
+                <div class="note-box">This QR code expires in 60 seconds and is single-use.</div>
+                <div class="helper-text">Signed enrollment token</div>
+                <code id="tokenOutput"></code>
+                <div class="step-actions">
+                  <button class="btn btn-outline" id="regenerateButton" type="button">Regenerate QR</button>
+                  <button class="btn btn-primary" id="confirmButton" type="button">Mark Device as Pending</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="hidden" id="stepThreeState">
+              <div class="note-box" style="margin-bottom:1rem;">Enrollment confirmed. The device now appears in the pending list below.</div>
+              <div class="pending-list" id="pendingList"></div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

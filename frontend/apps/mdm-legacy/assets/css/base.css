@@ -1,0 +1,132 @@
+/*
+  Base design tokens (prototype colours preserved) + dark UI tokens.
+  - Per project constraints, the prototype design tokens below are preserved
+    (do not change). A dark UI surface token is layered on top so we can
+    maintain a dark theme while keeping the canonical colour tokens intact.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap');
+
+:root {
+  /* Prototype colour tokens (do not modify) */
+  --green-900: #0D3D22;
+  --green-800: #1A6B3C;
+  --green-700: #218F4E;
+  --green-600: #27A85F;
+  --green-100: #E8F5EE;
+  --green-50:  #F2FAF5;
+  --amber:      #F5A623;
+  --amber-dark: #C8841A;
+  --amber-light:#FEF3DC;
+  --bg:         #F4F6F8;
+  --bg-white:   #FFFFFF;
+  --text:       #1C2B33;
+  --text-muted: #5A7080;
+  --border:     #DDE3E8;
+
+  /* Dark UI surface tokens (used by the app) */
+  --ui-bg:       #07111A; /* deep navy */
+  --ui-surface:  #0b1a24; /* slate panel */
+  --ui-elevate:  #0f2630; /* slightly lighter for elevated cards */
+  --ui-muted:    #9fb0bb; /* muted text on dark */
+  --ui-accent:   #06d6a0; /* electric teal accent */
+  --ui-warning:  var(--amber);
+  --ui-danger:   #E04848;
+  --ui-success:  var(--green-600);
+
+  /* Spacing scale */
+  --space-0: 0;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+
+  /* Typography scale */
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl:2rem;
+
+  /* Border radius & shadows */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+
+  --shadow-sm: 0 1px 2px rgba(2,6,23,0.6);
+  --shadow-md: 0 6px 18px rgba(2,6,23,0.55);
+  --shadow-lg: 0 20px 40px rgba(2,6,23,0.6);
+
+  /* Z-index layers */
+  --z-under: 0;
+  --z-base: 10;
+  --z-surface: 50;
+  --z-modal: 200;
+  --z-toast: 300;
+
+  /* Motion */
+  --timing-fast: 150ms;
+  --timing: 260ms;
+  --timing-slow: 420ms;
+}
+
+/* Global reset */
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%;margin:0;padding:0}
+img,svg,video,canvas{display:block;max-width:100%;height:auto}
+input,button,textarea,select{font:inherit}
+button{background:none;border:0;padding:0}
+ul{list-style:none;margin:0;padding:0}
+a{text-decoration:none;color:inherit}
+
+/* Base typography + dark background */
+body{
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  font-size:var(--fs-md);
+  line-height:1.45;
+  color: #E8F6EE; /* light text for contrast */
+  background: linear-gradient(180deg, var(--ui-bg), #031018 60%);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* Code / hash font */
+code,pre,tt{font-family:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, 'Courier New', monospace}
+
+/* Focus-visible accessibility ring */
+:focus{outline: none}
+:focus-visible{outline: 3px solid rgba(6,214,160,0.18);outline-offset:3px;border-radius:var(--r-sm)}
+
+/* Scrollbar styling (desktop) */
+*::-webkit-scrollbar{width:12px;height:12px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));border-radius:10px;border:3px solid transparent;background-clip:content-box}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce){
+  *{transition:none!important;animation:none!important}
+}
+
+/* Utility helpers */
+.container{max-width:1200px;margin:0 auto;padding:0 var(--space-4)}
+.section{padding:4.5rem 0}
+.section-label{display:inline-block;background:var(--green-800);color:#07111A;padding:0.25rem 0.5rem;border-radius:999px;font-weight:600;font-size:var(--fs-sm)}
+
+.btn{display:inline-flex;align-items:center;gap:0.5rem;border-radius:var(--r-md);padding:0.5rem 0.75rem;font-weight:600;cursor:pointer}
+.btn-primary{background:var(--ui-accent);color:#031018;box-shadow:var(--shadow-sm)}
+.btn-outline{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--ui-accent)}
+.btn-amber{background:var(--amber);color:#081018}
+.btn-lg{padding:0.75rem 1rem;font-size:var(--fs-lg)}
+
+/* Responsive breakpoints (markers) */
+/* <=480px: mobile base */
+/* 768px: tablet */
+/* 992px: tablet-landscape */
+/* 1200px: desktop */
+
+/* Small accessibility tweaks for contrasts */
+.muted{color:var(--ui-muted)}
+

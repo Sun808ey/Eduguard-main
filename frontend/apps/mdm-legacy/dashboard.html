@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="EduGuard system dashboard overview for monitoring device compliance, recent violations, and audit activity." />
+    <meta name="theme-color" content="#07111A" />
+    <title>EduGuard system — Dashboard Overview</title>
+    <link rel="icon" href="assets/img/favicon.ico" />
+    <link rel="stylesheet" href="assets/css/base.css" />
+    <link rel="stylesheet" href="assets/css/components.css" />
+    <link rel="stylesheet" href="assets/css/layout.css" />
+    <link rel="stylesheet" href="assets/css/dashboard.css" />
+    <link rel="stylesheet" href="assets/css/animations.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+    <script src="assets/js/dashboard.js" type="module"></script>
+  </head>
+  <body class="dashboard-page">
+    <div class="dashboard-shell">
+      <header class="dashboard-topbar">
+        <div class="dashboard-topbar__title">
+          <h1>Overview</h1>
+          <p>EduGuard system • Kampala Secondary School</p>
+        </div>
+        <div class="dashboard-topbar__meta" data-dashboard-meta></div>
+      </header>
+
+      <main class="dashboard-main">
+        <section class="overview-stack" aria-label="Dashboard overview">
+          <div class="overview-stat-grid" data-overview-stats></div>
+
+          <div class="overview-grid">
+            <section class="panel" aria-labelledby="compliance-heading">
+              <div class="panel__header">
+                <h2 id="compliance-heading">Class compliance</h2>
+                <span class="chip">Chart.js</span>
+              </div>
+              <div class="chart-wrap" data-compliance-chart aria-label="Class compliance bar chart"></div>
+            </section>
+
+            <section class="panel" aria-labelledby="violations-heading">
+              <div class="panel__header">
+                <h2 id="violations-heading">Recent violations</h2>
+                <span class="chip">Last 4</span>
+              </div>
+              <div data-recent-violations></div>
+            </section>
+          </div>
+
+          <section class="panel" aria-labelledby="audit-heading">
+            <div class="panel__header">
+              <h2 id="audit-heading">Recent audit log entries</h2>
+              <span class="chip">SHA-256 chain</span>
+            </div>
+            <div data-recent-audit></div>
+          </section>
+        </section>
+
+        <section class="panel device-section" aria-labelledby="devices-heading">
+          <div class="panel__header device-section__header">
+            <div>
+              <h2 id="devices-heading">Device management</h2>
+              <p class="device-section__subtitle">Search, filter, sort, paginate, and manage the 47 enrolled devices.</p>
+            </div>
+            <div class="device-section__actions">
+              <button class="btn btn-outline" type="button" data-enroll-open>QR Enroll</button>
+              <button class="btn btn-primary" type="button" data-export-csv>Export CSV</button>
+            </div>
+          </div>
+
+          <div class="filter-bar" role="search" aria-label="Device filters">
+            <label>
+              <span class="filter-label">Search</span>
+              <input type="search" placeholder="Device model, ID, district" data-device-search />
+            </label>
+            <label>
+              <span class="filter-label">Class</span>
+              <select data-filter-class></select>
+            </label>
+            <label>
+              <span class="filter-label">Status</span>
+              <select data-filter-status></select>
+            </label>
+            <label>
+              <span class="filter-label">Compliance</span>
+              <select data-filter-compliance></select>
+            </label>
+          </div>
+
+          <div class="device-section__message" data-device-message aria-live="polite"></div>
+
+          <div class="table-scroll device-table-wrap" data-device-table></div>
+          <div class="pagination-bar" data-device-pagination></div>
+        </section>
+
+        <section class="panel policy-section" aria-labelledby="policies-heading">
+          <div class="panel__header policy-section__header">
+            <div>
+              <h2 id="policies-heading">Policies</h2>
+              <p class="policy-section__subtitle">Six policy profiles with expand-to-review details and a draft policy editor.</p>
+            </div>
+            <button class="btn btn-primary" type="button" data-policy-create-open>Create Policy</button>
+          </div>
+
+          <div class="policy-grid" data-policies-grid></div>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal-backdrop" data-device-modal hidden>
+      <section class="modal device-modal" role="dialog" aria-modal="true" aria-labelledby="device-modal-title">
+        <div class="modal__header">
+          <h2 id="device-modal-title">Device detail</h2>
+          <button class="modal-close" type="button" data-device-modal-close aria-label="Close device details">×</button>
+        </div>
+        <div class="modal__body" data-device-modal-body></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" data-confirm-modal hidden>
+      <section class="modal device-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+        <div class="modal__header">
+          <h2 id="confirm-modal-title">Confirm wipe</h2>
+          <button class="modal-close" type="button" data-confirm-close aria-label="Close confirmation">×</button>
+        </div>
+        <div class="modal__body">
+          <p data-confirm-message></p>
+          <div class="modal-actions">
+            <button class="btn btn-ghost" type="button" data-confirm-cancel>Cancel</button>
+            <button class="btn btn-danger" type="button" data-confirm-accept>Wipe device</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" data-enroll-modal hidden>
+      <section class="modal device-modal" role="dialog" aria-modal="true" aria-labelledby="enroll-modal-title">
+        <div class="modal__header">
+          <h2 id="enroll-modal-title">QR enrollment</h2>
+          <button class="modal-close" type="button" data-enroll-close aria-label="Close enrollment">×</button>
+        </div>
+        <div class="modal__body">
+          <p>Open the enrollment workflow to generate the single-use QR code for a new device.</p>
+          <a class="btn btn-primary" href="enrollment.html">Open enrollment page</a>
+        </div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" data-policy-create-modal hidden>
+      <section class="modal device-modal policy-modal" role="dialog" aria-modal="true" aria-labelledby="policy-create-title">
+        <div class="modal__header">
+          <h2 id="policy-create-title">Create policy</h2>
+          <button class="modal-close" type="button" data-policy-create-close aria-label="Close policy editor">×</button>
+        </div>
+        <div class="modal__body">
+          <form class="policy-form" data-policy-form>
+            <label>
+              Policy name
+              <input type="text" name="name" required placeholder="Exam Kiosk - S.4" />
+            </label>
+            <label>
+              Target class
+              <select name="scope" data-policy-scope required></select>
+            </label>
+            <label>
+              Policy type
+              <select name="type" data-policy-type required></select>
+            </label>
+            <label>
+              App whitelist
+              <input type="text" name="apps" placeholder="Khan Academy, PDF reader" />
+            </label>
+            <label>
+              Schedule
+              <input type="text" name="schedule" placeholder="Mon-Fri 08:00-12:00" />
+            </label>
+            <label class="policy-form__toggle">
+              <span>Encryption</span>
+              <strong>AES-256 locked ON</strong>
+            </label>
+            <div class="policy-form__status-row">
+              <label>
+                Status
+                <select name="status" data-policy-status required></select>
+              </label>
+            </div>
+            <div class="modal-actions">
+              <button class="btn btn-ghost" type="button" data-policy-create-cancel>Cancel</button>
+              <button class="btn btn-primary" type="submit">Save policy</button>
+            </div>
+          </form>
+          <p class="device-section__message" data-policy-message aria-live="polite"></p>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
