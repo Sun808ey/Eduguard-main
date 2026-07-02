@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import sqlite3
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional, Tuple
@@ -48,7 +47,7 @@ def _json_payload(payload: Dict[str, Any]) -> str:
 
 
 def _append_audit_log(
-    connection: sqlite3.Connection,
+    connection,
     event_type: str,
     user_id: Optional[int],
     device_id: Optional[int],
@@ -64,7 +63,7 @@ def _append_audit_log(
 
 
 def _create_session(
-    connection: sqlite3.Connection,
+    connection,
     user_id: int,
     refresh_token: str,
     expires_at: datetime,
@@ -85,7 +84,7 @@ def _create_session(
     )
 
 
-def _issue_tokens(connection: sqlite3.Connection, user_id: int, role: str) -> Dict[str, Any]:
+def _issue_tokens(connection, user_id: int, role: str) -> Dict[str, Any]:
     private_key, _ = _load_jwt_keys()
     now = _utc_now()
     access_expires = now + timedelta(seconds=ACCESS_TOKEN_TTL_SECONDS)
@@ -136,7 +135,7 @@ def _decode_refresh_token(refresh_token: str) -> Dict[str, Any]:
     return payload
 
 
-def _get_active_user(connection: sqlite3.Connection, username: str) -> Optional[sqlite3.Row]:
+def _get_active_user(connection, username: str):
     return connection.execute(
         """
         SELECT id, username, password_hash, role, is_active
@@ -151,6 +150,15 @@ def _parse_iso8601(value: str) -> datetime:
     normalized = value.replace("Z", "+00:00")
     parsed = datetime.fromisoformat(normalized)
     return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+
+
+def _session_upsert_sql(connection) -> str:
+    return (
+        "INSERT INTO sessions (user_id, refresh_token_hash, created_at, expires_at, revoked) "
+        "VALUES (?, ?, ?, ?, 0)"
+        if getattr(connection, "_is_postgres", False)
+        else "INSERT INTO sessions (user_id, refresh_token_hash, created_at, expires_at, revoked) VALUES (?, ?, ?, ?, 0)"
+    )
 
 
 @auth_bp.post("/login")

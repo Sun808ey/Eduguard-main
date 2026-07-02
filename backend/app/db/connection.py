@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import sqlite3
 from pathlib import Path
 from typing import Any, Optional
@@ -59,6 +60,10 @@ class PostgresConnectionProxy:
     def __init__(self, connection: Any):
         self._connection = connection
 
+    @staticmethod
+    def _normalize_sql(sql: str) -> str:
+        return re.sub(r"\?", "%s", sql)
+
     def execute(self, sql: str, params: Any = None):
         try:
             from psycopg2.extras import RealDictCursor
@@ -66,8 +71,18 @@ class PostgresConnectionProxy:
             raise RuntimeError("psycopg2-binary is required for PostgreSQL connections") from exc
 
         cursor = self._connection.cursor(cursor_factory=RealDictCursor)
-        cursor.execute(sql, params or ())
+        cursor.execute(self._normalize_sql(sql), params or ())
         return _PostgresCursorProxy(cursor)
+
+    def cursor(self, cursor_factory=None):
+        try:
+            from psycopg2.extras import RealDictCursor
+        except ModuleNotFoundError as exc:  # pragma: no cover - exercised only when PostgreSQL is selected locally
+            raise RuntimeError("psycopg2-binary is required for PostgreSQL connections") from exc
+
+        if cursor_factory is None:
+            cursor_factory = RealDictCursor
+        return self._connection.cursor(cursor_factory=cursor_factory)
 
     def commit(self):
         return self._connection.commit()

@@ -62,13 +62,25 @@ def create_user():
     connection = get_connection()
     try:
         with connection:
-            cursor = connection.execute(
-                """
-                INSERT INTO users (username, password_hash, role, created_at, is_active)
-                VALUES (?, ?, ?, CURRENT_TIMESTAMP, 1)
-                """,
-                (username, _hash_password(password), role),
-            )
+            if getattr(connection, "_is_postgres", False):
+                created_row = connection.execute(
+                    """
+                    INSERT INTO users (username, password_hash, role, created_at, is_active)
+                    VALUES (%s, %s, %s, NOW(), TRUE)
+                    RETURNING id
+                    """,
+                    (username, _hash_password(password), role),
+                ).fetchone()
+                created_id = int(created_row["id"])
+            else:
+                cursor = connection.execute(
+                    """
+                    INSERT INTO users (username, password_hash, role, created_at, is_active)
+                    VALUES (?, ?, ?, CURRENT_TIMESTAMP, 1)
+                    """,
+                    (username, _hash_password(password), role),
+                )
+                created_id = int(cursor.lastrowid)
 
         created = connection.execute(
             """
@@ -76,7 +88,7 @@ def create_user():
             FROM users
             WHERE id = ?
             """,
-            (cursor.lastrowid,),
+            (created_id,),
         ).fetchone()
 
         return jsonify({"user": _serialize_user(created)}), 201

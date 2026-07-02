@@ -91,22 +91,42 @@ def _persist_policy_bundle(
     # FORENSIC ANNOTATION: The encrypted payload is signed after encryption so the device can verify authenticity before use.
     signature_b64 = sign_bundle(encrypted_payload + iv, _get_private_key_bytes())
     with connection:
-        cursor = connection.execute(
-            """
-            INSERT INTO policy_bundles (
-                title, version, encrypted_payload, signature, iv, created_by, created_at, is_active
-            ) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, 1)
-            """,
-            (
-                title,
-                version,
-                encrypted_payload,
-                base64.b64decode(signature_b64.encode("ascii")),
-                iv,
-                created_by,
-            ),
-        )
-    return int(cursor.lastrowid)
+        if getattr(connection, "_is_postgres", False):
+            created_row = connection.execute(
+                """
+                INSERT INTO policy_bundles (
+                    title, version, encrypted_payload, signature, iv, created_by, created_at, is_active
+                ) VALUES (%s, %s, %s, %s, %s, %s, NOW(), TRUE)
+                RETURNING id
+                """,
+                (
+                    title,
+                    version,
+                    encrypted_payload,
+                    base64.b64decode(signature_b64.encode("ascii")),
+                    iv,
+                    created_by,
+                ),
+            ).fetchone()
+            created_id = int(created_row["id"])
+        else:
+            cursor = connection.execute(
+                """
+                INSERT INTO policy_bundles (
+                    title, version, encrypted_payload, signature, iv, created_by, created_at, is_active
+                ) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, 1)
+                """,
+                (
+                    title,
+                    version,
+                    encrypted_payload,
+                    base64.b64decode(signature_b64.encode("ascii")),
+                    iv,
+                    created_by,
+                ),
+            )
+            created_id = int(cursor.lastrowid)
+    return int(created_id)
 
 
 def _fetch_policy_bundle(connection, policy_id: int):
@@ -236,13 +256,23 @@ def create_policy():
         created_by = int(g.current_user["id"])
         policy_id = _persist_policy_bundle(connection, title, version_int, policy_json, device, created_by)
         with connection:
-            connection.execute(
-                """
-                INSERT OR IGNORE INTO policy_assignments (device_id, policy_id, assigned_at, assigned_by)
-                VALUES (?, ?, CURRENT_TIMESTAMP, ?)
-                """,
-                (device_id_int, policy_id, created_by),
-            )
+            if getattr(connection, "_is_postgres", False):
+                connection.execute(
+                    """
+                    INSERT INTO policy_assignments (device_id, policy_id, assigned_at, assigned_by)
+                    VALUES (%s, %s, NOW(), %s)
+                    ON CONFLICT (device_id, policy_id) DO NOTHING
+                    """,
+                    (device_id_int, policy_id, created_by),
+                )
+            else:
+                connection.execute(
+                    """
+                    INSERT OR IGNORE INTO policy_assignments (device_id, policy_id, assigned_at, assigned_by)
+                    VALUES (?, ?, CURRENT_TIMESTAMP, ?)
+                    """,
+                    (device_id_int, policy_id, created_by),
+                )
             _append_audit_log(
                 connection,
                 event_type="POLICY_CREATED",
@@ -387,13 +417,23 @@ def assign_policy(policy_id: int):
 
         # FORENSIC ANNOTATION: Assignment records are append-only evidence that a device received a specific policy bundle.
         with connection:
-            connection.execute(
-                """
-                INSERT OR IGNORE INTO policy_assignments (device_id, policy_id, assigned_at, assigned_by)
-                VALUES (?, ?, CURRENT_TIMESTAMP, ?)
-                """,
-                (device_id_int, policy_id, int(g.current_user["id"])),
-            )
+            if getattr(connection, "_is_postgres", False):
+                connection.execute(
+                    """
+                    INSERT INTO policy_assignments (device_id, policy_id, assigned_at, assigned_by)
+                    VALUES (%s, %s, NOW(), %s)
+                    ON CONFLICT (device_id, policy_id) DO NOTHING
+                    """,
+                    (device_id_int, policy_id, int(g.current_user["id"])),
+                )
+            else:
+                connection.execute(
+                    """
+                    INSERT OR IGNORE INTO policy_assignments (device_id, policy_id, assigned_at, assigned_by)
+                    VALUES (?, ?, CURRENT_TIMESTAMP, ?)
+                    """,
+                    (device_id_int, policy_id, int(g.current_user["id"])),
+                )
             _append_audit_log(
                 connection,
                 event_type="POLICY_ASSIGNED",
