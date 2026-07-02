@@ -8,7 +8,8 @@ def load_local_env() -> None:
     if os.environ.get("VERCEL_ENV") is None:
         from dotenv import load_dotenv
 
-        load_dotenv(".env.local")
+        load_dotenv(".env")
+        load_dotenv(".env.local", override=True)
 
 
 def load_key_material(env_name: str, path_env_name: str, default_path: str) -> bytes:
