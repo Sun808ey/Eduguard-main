@@ -1,22 +1,42 @@
 from __future__ import annotations
 
 import os
+from typing import Iterable
 
 from flask import make_response, request
 from flask_cors import CORS
 
-ALLOWED_ORIGINS = [
+DEFAULT_ALLOWED_ORIGINS = [
     "https://eduguard-main.vercel.app",
     "http://localhost:3000",
     "http://localhost:5173",
 ]
 
-_extra = os.environ.get("EXTRA_CORS_ORIGINS", "")
-if _extra:
-    ALLOWED_ORIGINS.extend([origin.strip() for origin in _extra.split(",") if origin.strip()])
+def _split_origins(value: str) -> list[str]:
+    return [origin.strip() for origin in value.split(",") if origin.strip()]
+
+
+def _dedupe(values: Iterable[str]) -> list[str]:
+    seen = set()
+    result = []
+    for value in values:
+        if value not in seen:
+            seen.add(value)
+            result.append(value)
+    return result
+
+
+ALLOWED_ORIGINS = _dedupe(
+    DEFAULT_ALLOWED_ORIGINS
+    + _split_origins(os.environ.get("CORS_ALLOWED_ORIGINS", ""))
+    + _split_origins(os.environ.get("EXTRA_CORS_ORIGINS", ""))
+)
 
 
 def init_cors(app):
+    if os.environ.get("APP_ENV", "").lower() in {"production", "render"} and "*" in ALLOWED_ORIGINS:
+        raise RuntimeError("Wildcard CORS origins are not allowed in production")
+
     CORS(
         app,
         origins=ALLOWED_ORIGINS,

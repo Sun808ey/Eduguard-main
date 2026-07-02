@@ -74,7 +74,19 @@ def create_app() -> Flask:
     app.config["SECRET_KEY"] = settings.secret_key
     app.config["JWT_SECRET"] = settings.jwt_secret
     app.config["DATABASE_URL"] = settings.database_url
+    app.config["ENVIRONMENT"] = settings.environment
+    app.config["DEBUG"] = settings.debug
+    app.config["TESTING"] = False
+    app.config["SESSION_COOKIE_HTTPONLY"] = True
+    app.config["SESSION_COOKIE_SECURE"] = settings.is_production
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
     app.config["PROPAGATE_EXCEPTIONS"] = False
+
+    if settings.is_production:
+        if not settings.secret_key:
+            raise RuntimeError("FLASK_SECRET_KEY must be set in production")
+        if not settings.jwt_secret:
+            raise RuntimeError("JWT_SECRET must be set in production")
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(policies_bp)
@@ -133,7 +145,7 @@ def create_app() -> Flask:
                     "status": "ok",
                     "service": "EduGuard Policy API",
                     "version": "1.0.0",
-                    "env": settings.vercel_env,
+                    "env": settings.environment,
                 }
             ),
             200,

@@ -84,6 +84,20 @@ def _create_session(
     )
 
 
+def _normalize_login_response(user: Dict[str, Any], tokens: Dict[str, Any]) -> Tuple[Any, int]:
+    return (
+        jsonify(
+            {
+                "access_token": tokens["access_token"],
+                "refresh_token": tokens["refresh_token"],
+                "role": user["role"],
+                "expires_in": ACCESS_TOKEN_TTL_SECONDS,
+            }
+        ),
+        200,
+    )
+
+
 def _issue_tokens(connection, user_id: int, role: str) -> Dict[str, Any]:
     private_key, _ = _load_jwt_keys()
     now = _utc_now()
@@ -209,17 +223,7 @@ def login() -> Tuple[Any, int] | Any:
                 },
             )
 
-        return (
-            jsonify(
-                {
-                    "access_token": tokens["access_token"],
-                    "refresh_token": tokens["refresh_token"],
-                    "role": user["role"],
-                    "expires_in": ACCESS_TOKEN_TTL_SECONDS,
-                }
-            ),
-            200,
-        )
+        return _normalize_login_response(user, tokens)
     finally:
         connection.close()
 

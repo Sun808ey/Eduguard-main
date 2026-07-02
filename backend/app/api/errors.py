@@ -10,7 +10,7 @@ logger = logging.getLogger("eduguard.errors")
 
 
 def register_error_handlers(app):
-    is_dev = os.environ.get("VERCEL_ENV") is None
+    is_dev = os.environ.get("APP_ENV", "development").lower() == "development"
 
     @app.errorhandler(Exception)
     def handle_generic(error):
