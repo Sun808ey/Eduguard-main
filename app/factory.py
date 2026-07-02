@@ -16,7 +16,7 @@ from api.lib.env import load_local_env
 
 API_DIR = Path(__file__).resolve().parent.parent / "api"
 ROOT_DIR = API_DIR.parent
-SYSTEM_DIR = ROOT_DIR / "eduguard-mdm"
+SYSTEM_DIR = ROOT_DIR / "frontend"
 
 for path in (str(API_DIR), str(ROOT_DIR)):
     if path not in sys.path:
