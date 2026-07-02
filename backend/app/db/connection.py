@@ -10,6 +10,12 @@ from urllib.parse import urlparse
 DEFAULT_DB_PATH = Path(__file__).resolve().parents[2] / "data" / "eduguard.db"
 
 
+def _normalize_database_url(database_url: str) -> str:
+    if database_url.startswith("postgres://"):
+        return "postgresql://" + database_url[len("postgres://"):]
+    return database_url
+
+
 def _is_postgres_url(database_url: str) -> bool:
     scheme = urlparse(database_url).scheme.lower()
     return scheme in {"postgres", "postgresql", "postgresql+psycopg2"}
@@ -108,11 +114,11 @@ def get_connection(db_path: Optional[str] = None) -> sqlite3.Connection:
     """Create a database connection with secure defaults for offline sync workloads."""
     if db_path:
         if db_path.startswith(("postgres://", "postgresql://", "postgresql+psycopg2://")):
-            database_url = db_path
+            database_url = _normalize_database_url(db_path)
         else:
             return _open_sqlite_connection(Path(db_path))
     else:
-        database_url = os.environ.get("DATABASE_URL", "").strip()
+        database_url = _normalize_database_url(os.environ.get("DATABASE_URL", "").strip())
 
     if database_url and _is_postgres_url(database_url):
         try:
