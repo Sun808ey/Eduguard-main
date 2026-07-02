@@ -1,0 +1,202 @@
+/* Login page styles for EduGuard system */
+
+.login-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(6, 214, 160, 0.12), transparent 26%),
+    linear-gradient(180deg, #07111a 0%, #03080d 100%);
+}
+
+.login-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.login-card {
+  width: min(100%, 520px);
+  padding: 1.5rem;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(15, 38, 48, 0.98), rgba(11, 26, 36, 0.96));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: var(--shadow-lg);
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.login-brand__logo {
+  width: 54px;
+  height: 54px;
+  flex: none;
+}
+
+.login-brand__eyebrow {
+  margin: 0 0 0.2rem;
+  color: var(--ui-accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.login-brand h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  line-height: 1.05;
+}
+
+.login-card__intro,
+.login-card__hint,
+.twofa-step__header p,
+.twofa-note,
+.login-status,
+.field-error {
+  color: var(--ui-muted);
+}
+
+.login-card__intro {
+  margin: 0 0 1.35rem;
+}
+
+.login-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.field-group {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.field-group label {
+  font-weight: 700;
+  color: #eef7f2;
+}
+
+.field-group input {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.field-group input::placeholder {
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.field-group input:focus-visible {
+  outline: 3px solid rgba(6, 214, 160, 0.16);
+  outline-offset: 2px;
+}
+
+.password-field {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+}
+
+.password-toggle {
+  align-self: stretch;
+  padding: 0 0.9rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.twofa-step {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.twofa-step__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.twofa-step__header h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.1rem;
+}
+
+.otp-group {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.otp-group input {
+  aspect-ratio: 1 / 1;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.otp-group input:focus-visible {
+  outline: 3px solid rgba(6, 214, 160, 0.16);
+  outline-offset: 2px;
+}
+
+.twofa-note {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.login-status {
+  min-height: 1.25rem;
+  font-weight: 600;
+}
+
+.field-error {
+  min-height: 1rem;
+  margin: 0;
+  color: #ff9c9c;
+  font-size: 0.88rem;
+}
+
+.login-submit {
+  width: 100%;
+  justify-content: center;
+}
+
+.login-card__hint {
+  margin: 1rem 0 0;
+  font-size: 0.88rem;
+}
+
+@media (max-width: 480px) {
+  .login-shell {
+    padding: 1rem;
+  }
+
+  .login-card {
+    padding: 1.1rem;
+    border-radius: 18px;
+  }
+
+  .twofa-step__header {
+    flex-direction: column;
+  }
+
+  .otp-group {
+    gap: 0.35rem;
+  }
+}

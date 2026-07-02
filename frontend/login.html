@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Secure EduGuard system admin login for school LAN deployments." />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="theme-color" content="#0D3D22" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; connect-src 'self'; img-src 'self' data:; font-src 'self' https://fonts.gstatic.com; script-src 'self'; style-src 'self' https://fonts.googleapis.com 'sha256-pHoFY2R4HhuHTJv/shbZ6+yrQFVSTvT9Otv+InvfeiA=' 'sha256-jtqkrJJhKwFFrzAFe0F2F+LPGrfw45wFq+qiql0DDQ0=';"
+    />
+    <title>EduGuard system — Admin Login</title>
+    <link rel="icon" href="assets/img/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
+    <link rel="stylesheet" href="assets/css/base.css" />
+    <link rel="stylesheet" href="assets/css/components.css" />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
+    </noscript>
+    <style>
+      body.login-page {
+        min-height: 100vh;
+        margin: 0;
+        overflow-x: hidden;
+        background:
+          radial-gradient(circle at top, rgba(39, 168, 95, 0.28), transparent 32%),
+          linear-gradient(180deg, var(--green-900) 0%, #08111a 56%, #031018 100%);
+        color: var(--text);
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      }
+
+      .login-shell {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 1.5rem;
+      }
+
+      .login-card {
+        width: min(100%, 420px);
+        background: var(--bg-white);
+        border: 1px solid rgba(221, 227, 232, 0.92);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        padding: 1.75rem;
+      }
+
+      .login-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        margin-bottom: 1rem;
+      }
+
+      .login-brand__logo {
+        width: 132px;
+        height: auto;
+        flex: none;
+      }
+
+      .login-brand__eyebrow {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .login-title {
+        margin: 0.15rem 0 0;
+        color: var(--text);
+        font-size: clamp(2rem, 4vw, 2.45rem);
+        font-weight: 800;
+        line-height: 1.05;
+      }
+
+      .login-intro {
+        margin: 0 0 1.25rem;
+        color: var(--text-muted);
+      }
+
+      .login-form {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .field-group {
+        display: grid;
+        gap: 0.45rem;
+      }
+
+      .field-group label {
+        color: var(--text);
+        font-weight: 700;
+      }
+
+      .auth-input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 0.95rem 1rem;
+        border-radius: var(--r-md);
+        border: 1px solid var(--border);
+        background: var(--bg-white);
+        color: var(--text);
+        transition: border-color 160ms ease, box-shadow 160ms ease;
+      }
+
+      .auth-input::placeholder {
+        color: #8a9aa6;
+      }
+
+      .auth-input:focus {
+        border-color: var(--green-600);
+        box-shadow: 0 0 0 4px rgba(39, 168, 95, 0.14);
+        outline: none;
+      }
+
+      .password-field {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 0.5rem;
+      }
+
+      .password-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        min-width: 6.75rem;
+        padding: 0 0.9rem;
+        border: 1px solid var(--border);
+        border-radius: var(--r-md);
+        background: var(--bg);
+        color: var(--text);
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .password-toggle:focus-visible {
+        outline: 3px solid rgba(39, 168, 95, 0.18);
+        outline-offset: 2px;
+      }
+
+      .password-toggle__icon {
+        width: 1rem;
+        height: 1rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+      }
+
+      .password-toggle__icon svg {
+        width: 1rem;
+        height: 1rem;
+      }
+
+      .field-error {
+        min-height: 1rem;
+        margin: 0;
+        color: #b54848;
+        font-size: 0.86rem;
+      }
+
+      .login-status {
+        min-height: 1.25rem;
+        margin-top: 0.1rem;
+        color: var(--text-muted);
+        font-size: 0.92rem;
+        font-weight: 600;
+      }
+
+      .login-status[data-tone='success'] {
+        color: var(--green-700);
+      }
+
+      .login-status[data-tone='warning'] {
+        color: var(--amber-dark);
+      }
+
+      .login-status[data-tone='error'] {
+        color: #b54848;
+      }
+
+      .login-submit {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .login-footer {
+        display: grid;
+        gap: 0.6rem;
+        margin-top: 1rem;
+      }
+
+      .login-context {
+        margin: 0;
+        color: var(--amber-dark);
+        font-size: 0.88rem;
+        font-weight: 700;
+      }
+
+      .login-dashboard-link {
+        color: var(--green-700);
+        font-size: 0.88rem;
+        font-weight: 700;
+        text-decoration: underline;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 2px;
+      }
+
+      .lockout-timer {
+        font-variant-numeric: tabular-nums;
+      }
+
+      @media (max-width: 480px) {
+        .login-shell {
+          padding: 1rem;
+        }
+
+        .login-card {
+          width: 100%;
+          padding: 1.25rem;
+        }
+
+        .login-brand__logo {
+          width: 116px;
+        }
+
+        .password-field {
+          grid-template-columns: 1fr;
+        }
+
+        .password-toggle {
+          justify-content: center;
+          min-width: 0;
+        }
+      }
+    </style>
+    <script src="assets/js/auth.js" type="module"></script>
+  </head>
+  <body class="login-page">
+    <main class="login-shell">
+      <section class="login-card" aria-labelledby="login-title">
+        <div class="login-brand">
+          <svg class="login-brand__logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 32" role="img" aria-label="EduGuard logo">
+            <rect width="120" height="32" rx="4" fill="#1A6B3C" />
+            <text x="12" y="20" font-family="Arial, sans-serif" font-size="14" fill="#ffffff">EduGuard</text>
+          </svg>
+          <div>
+            <p class="login-brand__eyebrow">Kampala Secondary School</p>
+            <h1 class="login-title" id="login-title">Admin Login</h1>
+          </div>
+        </div>
+
+        <p class="login-intro">Sign in to continue to the EduGuard system dashboard.</p>
+
+        <form class="login-form" id="login-form" novalidate>
+          <div class="field-group">
+            <label for="username">Username</label>
+            <input
+              id="username"
+              name="username"
+              class="auth-input"
+              type="text"
+              autocomplete="username"
+              inputmode="text"
+              spellcheck="false"
+              placeholder="admin_user"
+              aria-describedby="username-error"
+              required
+            />
+            <p class="field-error" id="username-error" aria-live="polite"></p>
+          </div>
+
+          <div class="field-group">
+            <label for="password">Password</label>
+            <div class="password-field">
+              <input
+                id="password"
+                name="password"
+                class="auth-input"
+                type="password"
+                autocomplete="new-password"
+                placeholder="Enter your password"
+                aria-describedby="password-error"
+                required
+              />
+              <button class="password-toggle" type="button" data-password-toggle aria-label="Show password" aria-pressed="false">
+                <span class="password-toggle__icon" data-lucide="eye" aria-hidden="true"></span>
+                <span class="password-toggle__text">Show</span>
+              </button>
+            </div>
+            <p class="field-error" id="password-error" aria-live="polite"></p>
+          </div>
+
+          <div class="login-status" id="login-status" aria-live="polite" role="status"></div>
+
+          <button class="btn btn-primary btn-lg login-submit" type="submit" data-submit-button>
+            Sign in
+          </button>
+        </form>
+
+        <div class="login-footer">
+          <p class="login-context">EduGuard system — BSc Computer Security &amp; Forensics FYP</p>
+          <a class="login-dashboard-link" href="dashboard.html">Open dashboard</a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

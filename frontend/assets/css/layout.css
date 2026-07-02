@@ -1,0 +1,85 @@
+/* Layout system for EduGuard system
+	 - Mobile-first responsive layout
+	 - Sidebar: hidden on small screens (<=480px), icon-only at 768px,
+		 full-width at >=992px (248px)
+	 - Top header (topbar) fixed with blur backdrop
+	 - Main content area with proper overflow and sticky behaviours
+	 - Grid helpers for dashboard overview cards
+*/
+
+/* App shell */
+.app-shell{min-height:100vh;display:flex;background:var(--ui-bg);color:inherit}
+
+/* Sidebar */
+.sidebar{position:fixed;inset-y:0;left:0;transform:translateX(-110%);transition:transform var(--timing) ease;z-index:var(--z-surface);display:none}
+.sidebar--open{transform:translateX(0)}
+.sidebar__inner{width:72px;background:linear-gradient(180deg,var(--ui-surface),var(--ui-elevate));height:100%;padding:var(--space-4);display:flex;flex-direction:column;gap:1rem}
+.sidebar__brand{display:flex;align-items:center;gap:0.6rem}
+.sidebar__nav{display:flex;flex-direction:column;gap:0.25rem;margin-top:1rem}
+.sidebar__item{display:flex;align-items:center;gap:0.75rem;padding:0.6rem;border-radius:8px;color:var(--ui-muted)}
+.sidebar__item--active{background:linear-gradient(90deg, rgba(6,214,160,0.06), transparent);color:var(--ui-accent);font-weight:700}
+
+/* Topbar */
+.topbar{position:sticky;top:0;backdrop-filter:blur(6px);background:linear-gradient(180deg, rgba(2,6,23,0.5), rgba(2,6,23,0.25));height:64px;display:flex;align-items:center;gap:1rem;padding:0 var(--space-4);z-index:var(--z-surface)}
+.topbar__left{display:flex;align-items:center;gap:0.75rem}
+.topbar__center{flex:1;display:flex;align-items:center;justify-content:center;gap:1rem}
+.topbar__right{display:flex;align-items:center;gap:0.5rem}
+.topbar .mobile-nav-toggle{display:inline-flex;background:transparent;border:0;padding:0.45rem;border-radius:8px;color:var(--ui-muted)}
+
+/* Main content area - account for sidebar widths at breakpoints */
+.main-content{flex:1;padding:1rem 1rem 2rem;margin-left:0;transition:margin-left var(--timing) ease}
+
+/* Dashboard grid overview */
+.grid-overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem}
+
+/* Data table responsive wrapper */
+.table-wrap{width:100%;overflow:auto}
+.data-table{width:100%;border-collapse:collapse}
+.data-table th,.data-table td{padding:0.6rem 0.75rem;text-align:left}
+.data-table th:first-child,.data-table td:first-child{position:sticky;left:0;background:linear-gradient(90deg, rgba(255,255,255,0.02), transparent)}
+
+/* Breakpoints */
+@media (min-width: 480px){
+	/* small tablets - keep sidebar hidden by default but allow opening */
+	.sidebar{display:block}
+	.sidebar__inner{width:72px}
+}
+
+@media (min-width: 768px){
+	/* icon-only sidebar */
+	.sidebar{display:block}
+	.sidebar__inner{width:72px}
+	.main-content{margin-left:72px}
+}
+
+@media (min-width: 992px){
+	/* full sidebar */
+	.sidebar__inner{width:248px}
+	.main-content{margin-left:248px}
+}
+
+@media (min-width: 1200px){
+	.container{max-width:1200px}
+}
+
+/* Mobile drawer specifics */
+.mobile-drawer{position:fixed;inset:0;z-index:var(--z-modal);display:none}
+.mobile-drawer .drawer-panel{width:280px;background:var(--ui-surface);height:100%;box-shadow:var(--shadow-lg);transform:translateX(-8px);}
+.mobile-drawer.open{display:block}
+
+/* Sidebar collapse / icon-only behaviours */
+.sidebar .label{display:none}
+.sidebar .icon-only-show{display:inline-flex}
+
+/* Sidebar expanded styles for larger displays */
+@media (min-width: 992px){
+	.sidebar .label{display:inline-block;color:inherit}
+	.sidebar .icon-only-show{display:none}
+}
+
+/* Sticky header behaviour for table headers */
+.sticky-header thead th{position:sticky;top:64px;background:var(--ui-surface);z-index:80}
+
+/* Mobile hamburger / overlay close */
+.overlay-close{position:fixed;inset:0;background:rgba(2,6,23,0.5);z-index:var(--z-surface)}
+
