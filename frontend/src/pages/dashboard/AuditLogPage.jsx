@@ -41,13 +41,13 @@ function AuditLogPage() {
       title="Forensic Audit Log"
       subtitle="The route is kept separate so the audit chain can later move from seeded data to API fetches without changing dashboard navigation."
       chips={[`${rows.length} entries`, 'Hash-chained', 'Phase 1 seeded']}
-      actions={<button className="btn btn-primary" type="button" onClick={verifyChain}>Verify Chain</button>}
+      actions={<button className="btn btn-primary inline-flex items-center justify-center rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300" type="button" onClick={verifyChain}>Verify Chain</button>}
     >
-      <section className="panel">
-        <div className="panel__header"><h2>Recent audit events</h2><Chip>SHA-256</Chip></div>
-        <div className="device-section__message" aria-live="polite">{status}</div>
-        <div className="table-scroll">
-          <table className="dashboard-table" aria-label="Audit log entries">
+      <section className="panel rounded-3xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-black/20">
+        <div className="panel__header mb-4 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold text-white">Recent audit events</h2><Chip>SHA-256</Chip></div>
+        <div className="device-section__message mb-4 min-h-5 text-sm text-slate-400" aria-live="polite">{status}</div>
+        <div className="table-scroll overflow-x-auto">
+          <table className="dashboard-table w-full border-collapse" aria-label="Audit log entries">
             <thead>
               <tr>
                 <th>Event</th>
@@ -59,10 +59,10 @@ function AuditLogPage() {
             <tbody>
               {rows.map((entry) => (
                 <tr key={`${entry.hash}-${entry.timestamp}`}>
-                  <td><span className="chip">{entry.eventType}</span></td>
-                  <td>{entry.description}</td>
-                  <td><span className="hash-mono">{truncateHash(entry.hash)}</span></td>
-                  <td>{formatRelativeTime(entry.timestamp)}</td>
+                  <td><span className="chip inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200">{entry.eventType}</span></td>
+                  <td className="text-slate-200">{entry.description}</td>
+                  <td><span className="hash-mono font-mono text-sm text-slate-400">{truncateHash(entry.hash)}</span></td>
+                  <td className="text-slate-300">{formatRelativeTime(entry.timestamp)}</td>
                 </tr>
               ))}
             </tbody>

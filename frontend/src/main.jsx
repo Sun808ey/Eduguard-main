@@ -9,7 +9,6 @@ import '../assets/css/components.css';
 import '../assets/css/layout.css';
 import '../assets/css/animations.css';
 import '../assets/css/landing.css';
-import '../assets/css/dashboard.css';
 import '../assets/css/login.css';
 import './styles/enrollment.css';
 

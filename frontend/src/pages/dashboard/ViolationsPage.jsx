@@ -36,10 +36,10 @@ function ViolationsPage() {
       subtitle="Seeded violations provide a stable route target now and a direct replacement point for future API-fed incidents later."
       chips={[`${violations.length} incidents`, 'Severity ranked', 'Static data']}
     >
-      <section className="panel">
-        <div className="panel__header"><h2>Recent incidents</h2><Chip>Latest records</Chip></div>
-        <div className="table-scroll">
-          <table className="dashboard-table" aria-label="Recent violations">
+      <section className="panel rounded-3xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-black/20">
+        <div className="panel__header mb-4 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold text-white">Recent incidents</h2><Chip>Latest records</Chip></div>
+        <div className="table-scroll overflow-x-auto">
+          <table className="dashboard-table w-full border-collapse" aria-label="Recent violations">
             <thead>
               <tr>
                 <th>Severity</th>
@@ -54,10 +54,10 @@ function ViolationsPage() {
               {violations.map((row) => (
                 <tr key={`${row.device}-${row.timestamp}`}>
                   <td>{row.severity}</td>
-                  <td>{row.device}</td>
-                  <td>{row.violationType}</td>
-                  <td>{row.policyViolated}</td>
-                  <td>{formatRelativeTime(row.timestamp)}</td>
+                  <td className="text-slate-200">{row.device}</td>
+                  <td className="text-slate-200">{row.violationType}</td>
+                  <td className="text-slate-200">{row.policyViolated}</td>
+                  <td className="text-slate-300">{formatRelativeTime(row.timestamp)}</td>
                   <td>{row.status}</td>
                 </tr>
               ))}

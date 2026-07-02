@@ -32,9 +32,9 @@ function formatRelativeTime(isoString) {
 }
 
 function getSeverityClass(compliance) {
-  if (compliance === 'Violation') return 'severity-high';
-  if (compliance === 'Pending') return 'severity-med';
-  return 'severity-low';
+  if (compliance === 'Violation') return 'inline-flex rounded-full border border-rose-400/20 bg-rose-400/10 px-2.5 py-1 text-xs font-semibold text-rose-100';
+  if (compliance === 'Pending') return 'inline-flex rounded-full border border-amber-400/20 bg-amber-400/10 px-2.5 py-1 text-xs font-semibold text-amber-100';
+  return 'inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-xs font-semibold text-emerald-100';
 }
 
 function getTrendIcon(direction) {
@@ -59,7 +59,7 @@ function StatCards() {
           </div>
           <div className="stat-card__footer mt-4 flex items-center justify-between gap-3 text-sm text-slate-400">
             <span>{item.trend}</span>
-            <span className={`trend ${item.trendDir === 'down' ? 'trend--down' : item.trendDir === 'up' ? 'trend--up' : ''}`}>
+            <span className={`text-sm font-semibold ${item.trendDir === 'down' ? 'text-rose-300' : item.trendDir === 'up' ? 'text-emerald-300' : 'text-slate-400'}`}>
               {getTrendIcon(item.trendDir)}
             </span>
           </div>
@@ -136,12 +136,12 @@ function ViolationsTable() {
         <tbody>
           {RECENT_VIOLATIONS.map((row) => (
             <tr key={`${row.device}-${row.timestamp}`}>
-              <td><span className={`severity-${row.severity.toLowerCase() === 'high' ? 'high' : row.severity.toLowerCase() === 'med' ? 'med' : 'low'}`}>{row.severity}</span></td>
-              <td>{row.device}</td>
-              <td>{row.violationType}</td>
-              <td>{row.policyViolated}</td>
-              <td>{formatRelativeTime(row.timestamp)}</td>
-              <td><span className={`status-pill status-pill--${row.status.toLowerCase()}`}>{row.status}</span></td>
+              <td><span className={row.severity.toLowerCase() === 'high' ? 'inline-flex rounded-full border border-rose-400/20 bg-rose-400/10 px-2.5 py-1 text-xs font-semibold text-rose-100' : row.severity.toLowerCase() === 'med' ? 'inline-flex rounded-full border border-amber-400/20 bg-amber-400/10 px-2.5 py-1 text-xs font-semibold text-amber-100' : 'inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-xs font-semibold text-emerald-100'}>{row.severity}</span></td>
+              <td className="text-slate-200">{row.device}</td>
+              <td className="text-slate-200">{row.violationType}</td>
+              <td className="text-slate-200">{row.policyViolated}</td>
+              <td className="text-slate-300">{formatRelativeTime(row.timestamp)}</td>
+              <td><span className={row.status.toLowerCase() === 'open' ? 'inline-flex rounded-full border border-rose-400/20 bg-rose-400/10 px-2.5 py-1 text-xs font-semibold text-rose-100' : row.status.toLowerCase() === 'pending' ? 'inline-flex rounded-full border border-amber-400/20 bg-amber-400/10 px-2.5 py-1 text-xs font-semibold text-amber-100' : 'inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-xs font-semibold text-emerald-100'}>{row.status}</span></td>
             </tr>
           ))}
         </tbody>
@@ -165,10 +165,10 @@ function AuditTable({ rows }) {
         <tbody>
           {rows.map((entry) => (
             <tr key={`${entry.hash}-${entry.timestamp}`}>
-              <td><span className="chip">{entry.eventType}</span></td>
-              <td>{entry.description}</td>
-              <td><span className="hash-mono" title={entry.hash}>{truncateHash(entry.hash)}</span></td>
-              <td>{formatRelativeTime(entry.timestamp)}</td>
+              <td><span className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200">{entry.eventType}</span></td>
+              <td className="text-slate-200">{entry.description}</td>
+              <td><span className="font-mono text-sm text-slate-400" title={entry.hash}>{truncateHash(entry.hash)}</span></td>
+              <td className="text-slate-300">{formatRelativeTime(entry.timestamp)}</td>
             </tr>
           ))}
         </tbody>
@@ -186,12 +186,12 @@ function PolicyCard({ policy, expanded, onToggle }) {
             <h3 className="text-lg font-semibold text-white">{policy.title}</h3>
             <p className="mt-2 text-sm leading-7 text-slate-400">{policy.summary}</p>
           </div>
-          <span className={`status-pill status-pill--${policy.status.toLowerCase()}`}>{policy.status}</span>
+          <span className={policy.status.toLowerCase() === 'active' ? 'inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-xs font-semibold text-emerald-100' : policy.status.toLowerCase() === 'draft' ? 'inline-flex rounded-full border border-slate-400/20 bg-slate-400/10 px-2.5 py-1 text-xs font-semibold text-slate-100' : 'inline-flex rounded-full border border-amber-400/20 bg-amber-400/10 px-2.5 py-1 text-xs font-semibold text-amber-100'}>{policy.status}</span>
         </div>
         <div className="policy-card__meta mt-4 flex flex-wrap gap-2">
           <Chip>{policy.scope}</Chip>
           <Chip>{policy.type}</Chip>
-          <span className="encryption-badge">{policy.encryption}</span>
+          <span className="inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-200">{policy.encryption}</span>
         </div>
       </button>
       <div className="policy-card__details px-5 pb-5" hidden={!expanded}>
@@ -401,7 +401,7 @@ function DashboardPage() {
             <section className="panel rounded-3xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-black/20" aria-labelledby="compliance-heading">
               <div className="panel__header mb-4 flex items-center justify-between gap-3">
                 <h2 id="compliance-heading" className="text-lg font-semibold text-white">Class compliance</h2>
-                <span className="chip">Chart.js</span>
+                <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200">Chart.js</span>
               </div>
               <ComplianceChart />
             </section>
@@ -409,7 +409,7 @@ function DashboardPage() {
             <section className="panel rounded-3xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-black/20" aria-labelledby="violations-heading">
               <div className="panel__header mb-4 flex items-center justify-between gap-3">
                 <h2 id="violations-heading" className="text-lg font-semibold text-white">Recent violations</h2>
-                <span className="chip">Last 4</span>
+                <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200">Last 4</span>
               </div>
               <ViolationsTable />
             </section>
@@ -418,7 +418,7 @@ function DashboardPage() {
           <section className="panel rounded-3xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-black/20" aria-labelledby="audit-heading">
             <div className="panel__header mb-4 flex items-center justify-between gap-3">
               <h2 id="audit-heading" className="text-lg font-semibold text-white">Recent audit log entries</h2>
-              <span className="chip">SHA-256 chain</span>
+              <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200">SHA-256 chain</span>
             </div>
 
             <div className="audit-controls mb-4 flex flex-wrap items-center gap-3">
@@ -491,7 +491,7 @@ function DashboardPage() {
                       <div className="device-table__sub mt-1 text-xs text-slate-400">{device.id} • {device.district}</div>
                     </td>
                     <td>{device.classGroup}</td>
-                    <td><span className={`badge badge--${device.status.toLowerCase() === 'offline' ? 'offline' : device.status.toLowerCase() === 'syncing' ? 'syncing' : 'online'}`}>{device.status}</span></td>
+                    <td><span className={device.status.toLowerCase() === 'offline' ? 'inline-flex rounded-full border border-rose-400/20 bg-rose-400/10 px-2.5 py-1 text-xs font-semibold text-rose-100' : device.status.toLowerCase() === 'syncing' ? 'inline-flex rounded-full border border-amber-400/20 bg-amber-400/10 px-2.5 py-1 text-xs font-semibold text-amber-100' : 'inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-xs font-semibold text-emerald-100'}>{device.status}</span></td>
                     <td><span className={getSeverityClass(device.compliance)}>{device.compliance}</span></td>
                     <td>
                       <div className="battery-meter h-2.5 w-[92px] overflow-hidden rounded-full bg-white/10" aria-label={`${device.battery}% battery`}>
@@ -638,11 +638,11 @@ function DashboardPage() {
             {auditHistory.map((entry, index) => (
               <div className="audit-item flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3" role="listitem" key={`${entry.hash}-${entry.timestamp}`} data-audit-idx={index}>
                 <div className="audit-item__left">
-                  <div className="chip">{entry.eventType}</div>
+                  <div className="inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200">{entry.eventType}</div>
                 </div>
                 <div className="audit-item__main">
                   <div className="audit-item__desc font-semibold text-white">{entry.description}</div>
-                  <div className="audit-item__meta mt-1 text-sm text-slate-400"><span className="hash-mono font-mono">{truncateHash(entry.hash, 16)}</span> • {new Date(entry.timestamp).toLocaleString()}</div>
+                  <div className="audit-item__meta mt-1 text-sm text-slate-400"><span className="font-mono">{truncateHash(entry.hash, 16)}</span> • {new Date(entry.timestamp).toLocaleString()}</div>
                 </div>
                 <div className="audit-item__actions">
                   <button className="btn btn-ghost inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/10" type="button" onClick={() => setAuditDetail(entry)}>View</button>
@@ -657,7 +657,7 @@ function DashboardPage() {
         <ModalShell title="Audit detail" titleId="audit-detail-title" onClose={() => setAuditDetail(null)} className="audit-detail-modal">
           <p><strong>Event:</strong> {auditDetail.eventType}</p>
           <p><strong>Description:</strong> {auditDetail.description}</p>
-          <p><strong>SHA-256:</strong> <span className="hash-mono">{auditDetail.hash}</span></p>
+          <p><strong>SHA-256:</strong> <span className="font-mono">{auditDetail.hash}</span></p>
           <p><strong>Timestamp:</strong> {new Date(auditDetail.timestamp).toLocaleString()}</p>
           <div className="audit-detail-actions flex flex-wrap gap-3">
             <button className="btn btn-outline inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10" type="button" onClick={async () => {

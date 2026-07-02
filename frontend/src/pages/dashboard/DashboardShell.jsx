@@ -41,7 +41,7 @@ function DashboardShell() {
         <div className="dashboard-nav__footer mt-6 flex flex-wrap gap-2">
           <Chip>LAN-ready</Chip>
           <Chip>Vercel frontend</Chip>
-          <Chip className={`sync-badge sync-badge--${syncStatus.tone}`} aria-label={`Sync status ${syncStatus.label}`}>
+          <Chip className={syncStatus.tone === 'online' ? 'border-emerald-400/20 bg-emerald-400/10 text-emerald-100' : 'border-rose-400/20 bg-rose-400/10 text-rose-100'} aria-label={`Sync status ${syncStatus.label}`}>
             {syncStatus.label}
           </Chip>
         </div>
