@@ -2,7 +2,7 @@
 
 This folder contains the frontend for the EduGuard system proof-of-concept MVP.
 
-In production, the app is meant to be deployed to Vercel and pointed at the Flask backend with `VITE_API_BASE_URL`. The dashboard keeps working offline by falling back to seeded data if the backend cannot be reached.
+In production, the app is meant to be deployed as a separate static frontend and pointed at the Flask backend with `VITE_API_BASE_URL`. The dashboard keeps working offline by falling back to seeded data if the backend cannot be reached.
 
 To run the frontend together with the audit API in local development, start the backend on the LAN, then run the React app:
 
@@ -15,8 +15,9 @@ npm run dev
 Step 1 completed here: initial project skeleton and placeholder files.
 
 Deployment notes:
-- Set `VITE_API_BASE_URL` in Vercel to the HTTPS LAN URL of the Flask backend.
-- Keep the backend bound to `0.0.0.0` so clients on the same LAN can reach it.
+
+- Set `VITE_API_BASE_URL` in the frontend host to the HTTPS URL of the Render Flask backend.
+- Keep the backend bound to `0.0.0.0` so clients can reach it.
 - If the backend certificate changes, update the trusted cert on the client machine before testing the dashboard.
 
 See the [root docs architecture note](../docs/architecture.md) for high-level notes.

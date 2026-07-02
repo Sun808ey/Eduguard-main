@@ -6,7 +6,7 @@ from pathlib import Path
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 
 if str(BACKEND_DIR) not in sys.path:
-	sys.path.insert(0, str(BACKEND_DIR))
+    sys.path.insert(0, str(BACKEND_DIR))
 
 from app.factory import app, create_app, handler
 

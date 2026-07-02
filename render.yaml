@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: eduguard-backend
+    env: python
+    rootDir: backend
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn api.index:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: FLASK_SECRET_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: EXTRA_CORS_ORIGINS
+        sync: false

@@ -22,16 +22,32 @@ Run the backend and frontend from their own roots:
 cd "c:\Users\SUN\Downloads\Compressed\Eduguard-main\Eduguard-main"
 python -m pytest backend/tests/test_smoke.py
 
+npm install
+npm run dev
+```
+
+Deployment contract for the Render migration:
+
+- Backend platform: Render web service using `backend/api/index.py` through Gunicorn.
+- Backend blueprint: [render.yaml](render.yaml).
+
+- Database platform: Neon PostgreSQL.
+- Frontend platform: keep Vercel or another static host as a separate deployment target.
+- Required backend env vars: `APP_ENV`, `FLASK_SECRET_KEY`, `JWT_SECRET`, `DATABASE_URL`, `CORS_ALLOWED_ORIGINS`.
+
+For local frontend development:
+
+```powershell
 cd "c:\Users\SUN\Downloads\Compressed\Eduguard-main\Eduguard-main\frontend"
 npm install
 npm run dev
 ```
 
-The frontend keeps its offline fallback behavior. For the migration path, the backend is intended to move to Render with PostgreSQL (Neon), and the frontend should be treated as a separate deployment target.
+The frontend keeps its offline fallback behavior. The backend is now documented as a Render deployment target instead of a Vercel serverless function.
 
 Backend deployment contract for the next migration step:
+
 - Target runtime: Flask on Render with Gunicorn.
 - Target database: Neon PostgreSQL.
-- Required backend env vars: `FLASK_SECRET_KEY`, `JWT_SECRET`, `DATABASE_URL`, `VERCEL_ENV`.
 - Keep the current API behavior stable during setup; do not change database semantics in this step.
 
