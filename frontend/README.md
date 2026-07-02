@@ -19,6 +19,6 @@ Deployment notes:
 - Keep the backend bound to `0.0.0.0` so clients on the same LAN can reach it.
 - If the backend certificate changes, update the trusted cert on the client machine before testing the dashboard.
 
-See the [docs/architecture.md](docs/architecture.md) for high-level notes.
+See the [root docs architecture note](../docs/architecture.md) for high-level notes.
 
 The existing UI contracts and seeded audit data remain unchanged so frontend-only work still has a working fallback when the backend is offline.

@@ -4,6 +4,7 @@ This repository now uses a clearer split between the backend and frontend:
 
 - `backend/` contains the Flask backend, tests, and scripts.
 - `frontend/` contains the React/Vite frontend and static web assets.
+- `frontend/apps/mdm-legacy/` keeps the legacy frontend copy for rollback-safe transition.
 - `docs/` contains shared architecture notes and API contracts.
 - `eduguard-api/` is a separate NestJS starter project and is not the active backend.
 
