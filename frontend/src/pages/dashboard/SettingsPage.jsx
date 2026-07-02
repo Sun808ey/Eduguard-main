@@ -38,22 +38,22 @@ function SettingsPage() {
       subtitle="Settings stay intentionally lightweight for the prototype while preserving the route the production backend will eventually drive."
       chips={[DASHBOARD_SUMMARY.schoolName, 'LAN only', 'Configurable env']}
     >
-      <div className="overview-grid">
-        <section className="panel">
-          <div className="panel__header"><h2>Deployment settings</h2><Chip>Safe defaults</Chip></div>
-          <div className="device-detail-grid">
+      <div className="overview-grid grid gap-4 lg:grid-cols-2">
+        <section className="panel rounded-3xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-black/20">
+          <div className="panel__header mb-4 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold text-white">Deployment settings</h2><Chip>Safe defaults</Chip></div>
+          <div className="device-detail-grid grid gap-3 sm:grid-cols-2">
             {settings.map((item) => (
-              <div key={item.label} className="device-detail-item">
-                <span>{item.label}</span>
-                <strong>{item.value}</strong>
+              <div key={item.label} className="device-detail-item rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                <span className="block text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{item.label}</span>
+                <strong className="mt-2 block text-sm text-white">{item.value}</strong>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="panel">
-          <div className="panel__header"><h2>Operational notes</h2><Chip>Preserve behaviour</Chip></div>
-          <ul className="policy-card__details-list">
+        <section className="panel rounded-3xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-black/20">
+          <div className="panel__header mb-4 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold text-white">Operational notes</h2><Chip>Preserve behaviour</Chip></div>
+          <ul className="policy-card__details-list grid gap-3 text-sm text-slate-300">
             <li>Keep the backend on the same LAN for production testing.</li>
             <li>Use HTTPS when the hosted frontend talks to the backend.</li>
             <li>Phase 1 remains local and seeded; Phase 2 replaces reads with fetch calls.</li>

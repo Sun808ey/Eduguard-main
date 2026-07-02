@@ -45,19 +45,19 @@ function getTrendIcon(direction) {
 
 function StatCards() {
   return (
-    <div className="overview-stat-grid">
+    <div className="overview-stat-grid grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {OVERVIEW_STATS.map((item) => (
-        <article className={`card card--stat stat-card--dashboard ${item.colorClass}`} key={item.label}>
-          <div className="card__left">
-            <div className="card__icon" aria-hidden="true">
+        <article className={`card card--stat stat-card--dashboard rounded-3xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-black/20 backdrop-blur ${item.colorClass}`} key={item.label}>
+          <div className="card__left flex items-center gap-4">
+            <div className="card__icon flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-xl" aria-hidden="true">
               {item.icon === 'devices' ? '📱' : item.icon === 'online' ? '🟢' : item.icon === 'warning' ? '⚠️' : '🔄'}
             </div>
             <div>
-              <div className="stat-card__label">{item.label}</div>
-              <div className="stat-card__value">{item.value}</div>
+              <div className="stat-card__label text-sm font-medium text-slate-400">{item.label}</div>
+              <div className="stat-card__value text-3xl font-extrabold tracking-tight text-white sm:text-4xl">{item.value}</div>
             </div>
           </div>
-          <div className="stat-card__footer">
+          <div className="stat-card__footer mt-4 flex items-center justify-between gap-3 text-sm text-slate-400">
             <span>{item.trend}</span>
             <span className={`trend ${item.trendDir === 'down' ? 'trend--down' : item.trendDir === 'up' ? 'trend--up' : ''}`}>
               {getTrendIcon(item.trendDir)}
@@ -113,7 +113,7 @@ function ComplianceChart() {
   }, []);
 
   return (
-    <div className="chart-wrap" aria-label="Class compliance bar chart">
+    <div className="chart-wrap min-h-[280px]" aria-label="Class compliance bar chart">
       <canvas ref={canvasRef} height={260} />
     </div>
   );
@@ -121,8 +121,8 @@ function ComplianceChart() {
 
 function ViolationsTable() {
   return (
-    <div className="table-scroll">
-      <table className="dashboard-table" aria-label="Recent violations">
+    <div className="table-scroll overflow-x-auto">
+      <table className="dashboard-table w-full border-collapse text-left" aria-label="Recent violations">
         <thead>
           <tr>
             <th>Severity</th>
@@ -152,8 +152,8 @@ function ViolationsTable() {
 
 function AuditTable({ rows }) {
   return (
-    <div className="table-scroll">
-      <table className="dashboard-table" aria-label="Recent audit log entries">
+    <div className="table-scroll overflow-x-auto">
+      <table className="dashboard-table w-full border-collapse text-left" aria-label="Recent audit log entries">
         <thead>
           <tr>
             <th>Event</th>
@@ -179,26 +179,26 @@ function AuditTable({ rows }) {
 
 function PolicyCard({ policy, expanded, onToggle }) {
   return (
-    <article className={`policy-card ${expanded ? 'policy-card--expanded' : ''}`} data-policy-id={policy.id}>
-      <button className="policy-card__toggle" type="button" aria-expanded={expanded ? 'true' : 'false'} onClick={onToggle}>
-        <div className="policy-card__header">
+    <article className={`policy-card rounded-3xl border border-white/10 bg-white/5 shadow-lg shadow-black/20 ${expanded ? 'policy-card--expanded' : ''}`} data-policy-id={policy.id}>
+      <button className="policy-card__toggle w-full text-left" type="button" aria-expanded={expanded ? 'true' : 'false'} onClick={onToggle}>
+        <div className="policy-card__header flex items-start justify-between gap-4">
           <div>
-            <h3>{policy.title}</h3>
-            <p>{policy.summary}</p>
+            <h3 className="text-lg font-semibold text-white">{policy.title}</h3>
+            <p className="mt-2 text-sm leading-7 text-slate-400">{policy.summary}</p>
           </div>
           <span className={`status-pill status-pill--${policy.status.toLowerCase()}`}>{policy.status}</span>
         </div>
-        <div className="policy-card__meta">
+        <div className="policy-card__meta mt-4 flex flex-wrap gap-2">
           <Chip>{policy.scope}</Chip>
           <Chip>{policy.type}</Chip>
           <span className="encryption-badge">{policy.encryption}</span>
         </div>
       </button>
-      <div className="policy-card__details" hidden={!expanded}>
-        <ul>
+      <div className="policy-card__details px-5 pb-5" hidden={!expanded}>
+        <ul className="mt-4 grid gap-2 text-sm text-slate-300">
           {policy.details.map((item) => <li key={item}>{item}</li>)}
         </ul>
-        <div className="policy-card__footer">
+        <div className="policy-card__footer mt-4 flex items-center justify-between gap-3 text-xs text-slate-400">
           <span>Updated {policy.updatedAt}</span>
           <span>{policy.id}</span>
         </div>
@@ -380,98 +380,98 @@ function DashboardPage() {
   };
 
   return (
-    <div className="dashboard-overview">
-      <header className="dashboard-topbar">
-        <div className="dashboard-topbar__title">
-          <h1>Overview</h1>
-          <p>EduGuard system • Kampala Secondary School</p>
+    <div className="dashboard-overview space-y-6">
+      <header className="dashboard-topbar flex flex-col gap-4 rounded-3xl border border-white/10 bg-slate-900/80 p-5 shadow-lg shadow-black/20 backdrop-blur-xl lg:flex-row lg:items-center lg:justify-between">
+        <div className="dashboard-topbar__title space-y-1">
+          <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Overview</h1>
+          <p className="text-sm text-slate-400">EduGuard system • Kampala Secondary School</p>
         </div>
-        <div className="dashboard-topbar__meta" data-dashboard-meta>
+        <div className="dashboard-topbar__meta flex flex-wrap items-center gap-2" data-dashboard-meta>
           <Chip>{DASHBOARD_SUMMARY.schoolName}</Chip>
           <Chip>{DASHBOARD_SUMMARY.district}</Chip>
           <Badge tone="online">{DASHBOARD_SUMMARY.verifiedChainLabel}</Badge>
         </div>
       </header>
 
-      <main className="dashboard-main">
-        <section className="overview-stack" aria-label="Dashboard overview">
+      <main className="dashboard-main space-y-6">
+        <section className="overview-stack space-y-6" aria-label="Dashboard overview">
           <StatCards />
 
-          <div className="overview-grid">
-            <section className="panel" aria-labelledby="compliance-heading">
-              <div className="panel__header">
-                <h2 id="compliance-heading">Class compliance</h2>
+          <div className="overview-grid grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+            <section className="panel rounded-3xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-black/20" aria-labelledby="compliance-heading">
+              <div className="panel__header mb-4 flex items-center justify-between gap-3">
+                <h2 id="compliance-heading" className="text-lg font-semibold text-white">Class compliance</h2>
                 <span className="chip">Chart.js</span>
               </div>
               <ComplianceChart />
             </section>
 
-            <section className="panel" aria-labelledby="violations-heading">
-              <div className="panel__header">
-                <h2 id="violations-heading">Recent violations</h2>
+            <section className="panel rounded-3xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-black/20" aria-labelledby="violations-heading">
+              <div className="panel__header mb-4 flex items-center justify-between gap-3">
+                <h2 id="violations-heading" className="text-lg font-semibold text-white">Recent violations</h2>
                 <span className="chip">Last 4</span>
               </div>
               <ViolationsTable />
             </section>
           </div>
 
-          <section className="panel" aria-labelledby="audit-heading">
-            <div className="panel__header">
-              <h2 id="audit-heading">Recent audit log entries</h2>
+          <section className="panel rounded-3xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-black/20" aria-labelledby="audit-heading">
+            <div className="panel__header mb-4 flex items-center justify-between gap-3">
+              <h2 id="audit-heading" className="text-lg font-semibold text-white">Recent audit log entries</h2>
               <span className="chip">SHA-256 chain</span>
             </div>
 
-            <div className="audit-controls">
-              <button className="btn btn-outline" type="button" onClick={verifyAudit}>Verify Chain</button>
-              <button className="btn btn-primary" type="button" onClick={openHistory}>Open Audit History</button>
-              <span className={`audit-result muted ${auditTone === 'ok' ? 'audit-result--ok' : auditTone === 'bad' ? 'audit-result--bad' : ''}`}>{auditStatus}</span>
+            <div className="audit-controls mb-4 flex flex-wrap items-center gap-3">
+              <button className="btn btn-outline inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10" type="button" onClick={verifyAudit}>Verify Chain</button>
+              <button className="btn btn-primary inline-flex items-center justify-center rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300" type="button" onClick={openHistory}>Open Audit History</button>
+              <span className={`audit-result muted text-sm ${auditTone === 'ok' ? 'audit-result--ok' : auditTone === 'bad' ? 'audit-result--bad' : ''}`}>{auditStatus}</span>
             </div>
 
             <AuditTable rows={RECENT_AUDIT_LOG} />
           </section>
         </section>
 
-        <section className="panel device-section" aria-labelledby="devices-heading">
-          <div className="panel__header device-section__header">
+        <section className="panel device-section rounded-3xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-black/20" aria-labelledby="devices-heading">
+          <div className="panel__header device-section__header mb-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h2 id="devices-heading">Device management</h2>
-              <p className="device-section__subtitle">Search, filter, sort, paginate, and manage the 47 enrolled devices.</p>
+              <h2 id="devices-heading" className="text-lg font-semibold text-white">Device management</h2>
+              <p className="device-section__subtitle mt-2 text-sm text-slate-400">Search, filter, sort, paginate, and manage the 47 enrolled devices.</p>
             </div>
-            <div className="device-section__actions">
-              <Link className="btn btn-outline" to="/enrollment">QR Enroll</Link>
-              <button className="btn btn-primary" type="button" onClick={exportCsv}>Export CSV</button>
+            <div className="device-section__actions flex flex-wrap gap-3">
+              <Link className="btn btn-outline inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10" to="/enrollment">QR Enroll</Link>
+              <button className="btn btn-primary inline-flex items-center justify-center rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300" type="button" onClick={exportCsv}>Export CSV</button>
             </div>
           </div>
 
-          <div className="filter-bar" role="search" aria-label="Device filters">
-            <label>
-              <span className="filter-label">Search</span>
-              <input type="search" placeholder="Device model, ID, district" value={search} onChange={(event) => setSearch(event.target.value)} />
+          <div className="filter-bar mb-4 grid gap-3 lg:grid-cols-[1.4fr_repeat(3,minmax(140px,1fr))]" role="search" aria-label="Device filters">
+            <label className="grid gap-2">
+              <span className="filter-label text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Search</span>
+              <input className="rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-cyan-400/60 focus:bg-slate-950" type="search" placeholder="Device model, ID, district" value={search} onChange={(event) => setSearch(event.target.value)} />
             </label>
-            <label>
-              <span className="filter-label">Class</span>
-              <select value={classFilter} onChange={(event) => setClassFilter(event.target.value)}>
+            <label className="grid gap-2">
+              <span className="filter-label text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Class</span>
+              <select className="rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-400/60 focus:bg-slate-950" value={classFilter} onChange={(event) => setClassFilter(event.target.value)}>
                 {DEVICE_CLASS_OPTIONS.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </label>
-            <label>
-              <span className="filter-label">Status</span>
-              <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+            <label className="grid gap-2">
+              <span className="filter-label text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Status</span>
+              <select className="rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-400/60 focus:bg-slate-950" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
                 {DEVICE_STATUS_OPTIONS.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </label>
-            <label>
-              <span className="filter-label">Compliance</span>
-              <select value={complianceFilter} onChange={(event) => setComplianceFilter(event.target.value)}>
+            <label className="grid gap-2">
+              <span className="filter-label text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Compliance</span>
+              <select className="rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-400/60 focus:bg-slate-950" value={complianceFilter} onChange={(event) => setComplianceFilter(event.target.value)}>
                 {COMPLIANCE_FILTERS.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </label>
           </div>
 
-          <div className="device-section__message" aria-live="polite">{message}</div>
+          <div className="device-section__message mb-3 min-h-5 text-sm text-slate-400" aria-live="polite">{message}</div>
 
-          <div className="table-scroll device-table-wrap" ref={tableBodyRef}>
-            <table className="device-table" aria-label="Enrolled devices">
+          <div className="table-scroll device-table-wrap overflow-x-auto" ref={tableBodyRef}>
+            <table className="device-table w-full border-collapse" aria-label="Enrolled devices">
               <thead>
                 <tr>
                   <th data-sort-key="model" onClick={() => handleSort('model')}>Device</th>
@@ -487,22 +487,22 @@ function DashboardPage() {
                 {visibleDevices.map((device) => (
                   <tr key={device.id}>
                     <td>
-                      <div className="device-table__model">{device.model}</div>
-                      <div className="device-table__sub">{device.id} • {device.district}</div>
+                      <div className="device-table__model text-sm font-semibold text-white">{device.model}</div>
+                      <div className="device-table__sub mt-1 text-xs text-slate-400">{device.id} • {device.district}</div>
                     </td>
                     <td>{device.classGroup}</td>
                     <td><span className={`badge badge--${device.status.toLowerCase() === 'offline' ? 'offline' : device.status.toLowerCase() === 'syncing' ? 'syncing' : 'online'}`}>{device.status}</span></td>
                     <td><span className={getSeverityClass(device.compliance)}>{device.compliance}</span></td>
                     <td>
-                      <div className="battery-meter" aria-label={`${device.battery}% battery`}>
-                        <div className={`battery-meter__fill ${device.battery < 30 ? 'battery-meter__fill--low' : ''}`} style={{ width: `${device.battery}%` }} />
+                      <div className="battery-meter h-2.5 w-[92px] overflow-hidden rounded-full bg-white/10" aria-label={`${device.battery}% battery`}>
+                        <div className={`battery-meter__fill h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-300 ${device.battery < 30 ? 'battery-meter__fill--low' : ''}`} style={{ width: `${device.battery}%` }} />
                       </div>
                     </td>
                     <td>{formatRelativeTime(device.lastSync)}</td>
                     <td>
-                      <div className="device-actions">
+                      <div className="device-actions flex flex-wrap gap-2">
                         {['view', 'push', 'lock', 'sync', 'wipe', 'alert'].map((action) => (
-                          <button key={action} className={action === 'wipe' ? 'btn btn-danger' : 'btn btn-ghost'} type="button" onClick={() => handleAction(action, device)}>
+                          <button key={action} className={action === 'wipe' ? 'btn btn-danger inline-flex rounded-full bg-rose-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-rose-400' : 'btn btn-ghost inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/10'} type="button" onClick={() => handleAction(action, device)}>
                             {action === 'view' ? 'View' : action === 'push' ? 'Push Policy' : action === 'lock' ? 'Lock' : action === 'sync' ? 'Force Sync' : action === 'wipe' ? 'Wipe' : 'Alert'}
                           </button>
                         ))}
@@ -514,13 +514,13 @@ function DashboardPage() {
             </table>
           </div>
 
-          <div className="pagination-bar">
-            <div className="pagination-bar__meta">
+          <div className="pagination-bar mt-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="pagination-bar__meta text-sm text-slate-400">
               Showing {Math.min((page - 1) * pageSize + 1, filteredDevices.length)}-{Math.min(page * pageSize, filteredDevices.length)} of {filteredDevices.length} devices
             </div>
-            <div className="pagination-controls">
+            <div className="pagination-controls flex flex-wrap gap-2">
               {Array.from({ length: totalPages }, (_, index) => index + 1).map((item) => (
-                <button key={item} className="btn btn-ghost" type="button" aria-current={item === page ? 'page' : undefined} onClick={() => setPage(item)}>
+                <button key={item} className={`btn btn-ghost inline-flex rounded-full border px-4 py-2 text-sm font-semibold transition ${item === page ? 'border-cyan-400/40 bg-cyan-400 text-slate-950' : 'border-white/10 bg-white/5 text-white hover:bg-white/10'}`} type="button" aria-current={item === page ? 'page' : undefined} onClick={() => setPage(item)}>
                   {item}
                 </button>
               ))}
@@ -528,16 +528,16 @@ function DashboardPage() {
           </div>
         </section>
 
-        <section className="panel policy-section" aria-labelledby="policies-heading">
-          <div className="panel__header policy-section__header">
+        <section className="panel policy-section rounded-3xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-black/20" aria-labelledby="policies-heading">
+          <div className="panel__header policy-section__header mb-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h2 id="policies-heading">Policies</h2>
-              <p className="policy-section__subtitle">Six policy profiles with expand-to-review details and a draft policy editor.</p>
+              <h2 id="policies-heading" className="text-lg font-semibold text-white">Policies</h2>
+              <p className="policy-section__subtitle mt-2 text-sm text-slate-400">Six policy profiles with expand-to-review details and a draft policy editor.</p>
             </div>
-            <button className="btn btn-primary" type="button" onClick={() => setCreatePolicyOpen(true)}>Create Policy</button>
+            <button className="btn btn-primary inline-flex items-center justify-center rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300" type="button" onClick={() => setCreatePolicyOpen(true)}>Create Policy</button>
           </div>
 
-          <div className="policy-grid" data-policies-grid>
+          <div className="policy-grid grid gap-4 xl:grid-cols-2" data-policies-grid>
             {POLICIES.map((policy) => (
               <PolicyCard
                 key={policy.id}
@@ -553,7 +553,7 @@ function DashboardPage() {
 
       {selectedDevice ? (
         <ModalShell title="Device detail" titleId="device-modal-title" onClose={() => setSelectedDevice(null)} className="device-modal">
-          <div className="device-detail-grid">
+          <div className="device-detail-grid grid gap-3 sm:grid-cols-2">
             <div className="device-detail-item"><span>Device</span><strong>{selectedDevice.model}</strong></div>
             <div className="device-detail-item"><span>Device ID</span><strong>{selectedDevice.id}</strong></div>
             <div className="device-detail-item"><span>Class</span><strong>{selectedDevice.classGroup}</strong></div>
@@ -575,9 +575,9 @@ function DashboardPage() {
           onClose={() => setWipeDevice(null)}
           className="device-modal"
           actions={(
-            <div className="modal-actions">
-              <button className="btn btn-ghost" type="button" onClick={() => setWipeDevice(null)}>Cancel</button>
-              <button className="btn btn-danger" type="button" onClick={() => { setMessage(`Wipe queued for ${wipeDevice.model} (${wipeDevice.id}).`); setWipeDevice(null); }}>Wipe device</button>
+            <div className="modal-actions flex flex-wrap gap-3">
+              <button className="btn btn-ghost inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10" type="button" onClick={() => setWipeDevice(null)}>Cancel</button>
+              <button className="btn btn-danger inline-flex rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-400" type="button" onClick={() => { setMessage(`Wipe queued for ${wipeDevice.model} (${wipeDevice.id}).`); setWipeDevice(null); }}>Wipe device</button>
             </div>
           )}
         >
@@ -587,46 +587,46 @@ function DashboardPage() {
 
       {createPolicyOpen ? (
         <ModalShell title="Create policy" titleId="policy-create-title" onClose={() => setCreatePolicyOpen(false)} className="device-modal policy-modal">
-          <form className="policy-form" onSubmit={submitPolicy}>
-            <label>
+          <form className="policy-form grid gap-4" onSubmit={submitPolicy}>
+            <label className="grid gap-2 text-sm font-medium text-slate-200">
               Policy name
-              <input type="text" name="name" required placeholder="Exam Kiosk - S.4" value={policyForm.name} onChange={(event) => setPolicyForm({ ...policyForm, name: event.target.value })} />
+              <input className="rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-cyan-400/60 focus:bg-slate-950" type="text" name="name" required placeholder="Exam Kiosk - S.4" value={policyForm.name} onChange={(event) => setPolicyForm({ ...policyForm, name: event.target.value })} />
             </label>
-            <label>
+            <label className="grid gap-2 text-sm font-medium text-slate-200">
               Target class
-              <select name="scope" required value={policyForm.scope} onChange={(event) => setPolicyForm({ ...policyForm, scope: event.target.value })}>
+              <select className="rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-400/60 focus:bg-slate-950" name="scope" required value={policyForm.scope} onChange={(event) => setPolicyForm({ ...policyForm, scope: event.target.value })}>
                 {['All Classes', 'S.1', 'S.2', 'S.3', 'S.4', 'S.5', 'S.6'].map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </label>
-            <label>
+            <label className="grid gap-2 text-sm font-medium text-slate-200">
               Policy type
-              <select name="type" required value={policyForm.type} onChange={(event) => setPolicyForm({ ...policyForm, type: event.target.value })}>
+              <select className="rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-400/60 focus:bg-slate-950" name="type" required value={policyForm.type} onChange={(event) => setPolicyForm({ ...policyForm, type: event.target.value })}>
                 {POLICY_TYPES.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </label>
-            <label>
+            <label className="grid gap-2 text-sm font-medium text-slate-200">
               App whitelist
-              <input type="text" name="apps" placeholder="Khan Academy, PDF reader" value={policyForm.apps} onChange={(event) => setPolicyForm({ ...policyForm, apps: event.target.value })} />
+              <input className="rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-cyan-400/60 focus:bg-slate-950" type="text" name="apps" placeholder="Khan Academy, PDF reader" value={policyForm.apps} onChange={(event) => setPolicyForm({ ...policyForm, apps: event.target.value })} />
             </label>
-            <label>
+            <label className="grid gap-2 text-sm font-medium text-slate-200">
               Schedule
-              <input type="text" name="schedule" placeholder="Mon-Fri 08:00-12:00" value={policyForm.schedule} onChange={(event) => setPolicyForm({ ...policyForm, schedule: event.target.value })} />
+              <input className="rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-cyan-400/60 focus:bg-slate-950" type="text" name="schedule" placeholder="Mon-Fri 08:00-12:00" value={policyForm.schedule} onChange={(event) => setPolicyForm({ ...policyForm, schedule: event.target.value })} />
             </label>
-            <label className="policy-form__toggle">
+            <label className="policy-form__toggle flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200">
               <span>Encryption</span>
-              <strong>AES-256 locked ON</strong>
+              <strong className="text-cyan-200">AES-256 locked ON</strong>
             </label>
             <div className="policy-form__status-row">
-              <label>
+              <label className="grid gap-2 text-sm font-medium text-slate-200">
                 Status
-                <select name="status" required value={policyForm.status} onChange={(event) => setPolicyForm({ ...policyForm, status: event.target.value })}>
+                <select className="rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-400/60 focus:bg-slate-950" name="status" required value={policyForm.status} onChange={(event) => setPolicyForm({ ...policyForm, status: event.target.value })}>
                   {['Active', 'Scheduled', 'Draft', 'Inactive'].map((item) => <option key={item} value={item}>{item}</option>)}
                 </select>
               </label>
             </div>
-            <div className="modal-actions">
-              <button className="btn btn-ghost" type="button" onClick={() => setCreatePolicyOpen(false)}>Cancel</button>
-              <button className="btn btn-primary" type="submit">Save policy</button>
+            <div className="modal-actions flex flex-wrap gap-3">
+              <button className="btn btn-ghost inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10" type="button" onClick={() => setCreatePolicyOpen(false)}>Cancel</button>
+              <button className="btn btn-primary inline-flex rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300" type="submit">Save policy</button>
             </div>
           </form>
         </ModalShell>
@@ -634,18 +634,18 @@ function DashboardPage() {
 
       {auditHistoryOpen ? (
         <ModalShell title="Audit history" titleId="audit-history-title" onClose={() => setAuditHistoryOpen(false)} className="audit-modal">
-          <div className="audit-list" role="list">
+          <div className="audit-list grid gap-3 max-h-[48vh] overflow-auto" role="list">
             {auditHistory.map((entry, index) => (
-              <div className="audit-item" role="listitem" key={`${entry.hash}-${entry.timestamp}`} data-audit-idx={index}>
+              <div className="audit-item flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3" role="listitem" key={`${entry.hash}-${entry.timestamp}`} data-audit-idx={index}>
                 <div className="audit-item__left">
                   <div className="chip">{entry.eventType}</div>
                 </div>
                 <div className="audit-item__main">
-                  <div className="audit-item__desc">{entry.description}</div>
-                  <div className="audit-item__meta"><span className="hash-mono">{truncateHash(entry.hash, 16)}</span> • {new Date(entry.timestamp).toLocaleString()}</div>
+                  <div className="audit-item__desc font-semibold text-white">{entry.description}</div>
+                  <div className="audit-item__meta mt-1 text-sm text-slate-400"><span className="hash-mono font-mono">{truncateHash(entry.hash, 16)}</span> • {new Date(entry.timestamp).toLocaleString()}</div>
                 </div>
                 <div className="audit-item__actions">
-                  <button className="btn btn-ghost" type="button" onClick={() => setAuditDetail(entry)}>View</button>
+                  <button className="btn btn-ghost inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/10" type="button" onClick={() => setAuditDetail(entry)}>View</button>
                 </div>
               </div>
             ))}
@@ -659,8 +659,8 @@ function DashboardPage() {
           <p><strong>Description:</strong> {auditDetail.description}</p>
           <p><strong>SHA-256:</strong> <span className="hash-mono">{auditDetail.hash}</span></p>
           <p><strong>Timestamp:</strong> {new Date(auditDetail.timestamp).toLocaleString()}</p>
-          <div className="audit-detail-actions">
-            <button className="btn btn-outline" type="button" onClick={async () => {
+          <div className="audit-detail-actions flex flex-wrap gap-3">
+            <button className="btn btn-outline inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10" type="button" onClick={async () => {
               const verification = auditDetail.hash && !Number.isNaN(new Date(auditDetail.timestamp).getTime());
               if (verification) {
                 window.alert('Entry appears well-formed');
@@ -674,7 +674,7 @@ function DashboardPage() {
                 window.alert('Entry malformed');
               }
             }}>Verify entry</button>
-            <button className="btn btn-primary audit-detail-actions__button" type="button" onClick={async () => {
+            <button className="btn btn-primary audit-detail-actions__button inline-flex rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300" type="button" onClick={async () => {
               try {
                 await navigator.clipboard.writeText(auditDetail.hash);
                 window.alert('Hash copied to clipboard');

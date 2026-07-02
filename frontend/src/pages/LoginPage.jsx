@@ -100,23 +100,23 @@ function LoginPage() {
   };
 
   return (
-    <main className="login-shell">
-      <section className="login-card" aria-labelledby="login-title">
-        <div className="login-brand">
-          <img src={logoUrl} alt="EduGuard system" className="login-brand__logo" />
-          <div>
-            <p className="login-brand__eyebrow">EduGuard system</p>
-            <h1 id="login-title">Admin Login</h1>
+    <main className="login-shell min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_42%),linear-gradient(180deg,#020617_0%,#0f172a_100%)] px-4 py-10 text-slate-100 sm:px-6 lg:px-8">
+      <section className="login-card mx-auto flex w-full max-w-lg flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-8" aria-labelledby="login-title">
+        <div className="login-brand flex items-center gap-4">
+          <img src={logoUrl} alt="EduGuard system" className="login-brand__logo h-14 w-14 rounded-2xl shadow-lg shadow-black/20 ring-1 ring-white/10" />
+          <div className="space-y-1">
+            <p className="login-brand__eyebrow text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/90">EduGuard system</p>
+            <h1 id="login-title" className="text-3xl font-semibold tracking-tight sm:text-4xl">Admin Login</h1>
           </div>
         </div>
 
-        <p className="login-card__intro">
+        <p className="login-card__intro text-sm leading-7 text-slate-300 sm:text-base">
           Sign in with your school admin account to continue to the dashboard.
         </p>
 
-        <form className="login-form" noValidate onSubmit={handleSubmit}>
-          <div className="field-group">
-            <label htmlFor="email">Email address</label>
+        <form className="login-form space-y-5" noValidate onSubmit={handleSubmit}>
+          <div className="field-group space-y-2">
+            <label htmlFor="email" className="text-sm font-medium text-slate-200">Email address</label>
             <input
               id="email"
               name="email"
@@ -128,13 +128,14 @@ function LoginPage() {
               aria-describedby="email-error"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
+              className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 outline-none ring-0 transition placeholder:text-slate-500 focus:border-cyan-400/60 focus:bg-slate-950 focus:shadow-[0_0_0_4px_rgba(34,211,238,0.12)]"
             />
-            <p className="field-error" id="email-error" aria-live="polite">{errors.email}</p>
+            <p className="field-error min-h-5 text-sm text-rose-300" id="email-error" aria-live="polite">{errors.email}</p>
           </div>
 
-          <div className="field-group">
-            <label htmlFor="password">Password</label>
-            <div className="password-field">
+          <div className="field-group space-y-2">
+            <label htmlFor="password" className="text-sm font-medium text-slate-200">Password</label>
+            <div className="password-field flex items-stretch gap-3">
               <input
                 id="password"
                 ref={passwordRef}
@@ -149,9 +150,10 @@ function LoginPage() {
                 aria-describedby="password-error"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
+                className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 outline-none ring-0 transition placeholder:text-slate-500 focus:border-cyan-400/60 focus:bg-slate-950 focus:shadow-[0_0_0_4px_rgba(34,211,238,0.12)]"
               />
               <button
-                className="password-toggle"
+                className="password-toggle inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-100 transition hover:bg-white/10"
                 type="button"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
                 onClick={() => setShowPassword((value) => !value)}
@@ -159,19 +161,19 @@ function LoginPage() {
                 {showPassword ? 'Hide' : 'Show'}
               </button>
             </div>
-            <p className="field-error" id="password-error" aria-live="polite">{errors.password}</p>
+            <p className="field-error min-h-5 text-sm text-rose-300" id="password-error" aria-live="polite">{errors.password}</p>
           </div>
 
-          <div className="login-status" id="login-status" aria-live="polite" data-tone={statusTone}>
+          <div className="login-status rounded-2xl border border-white/10 px-4 py-3 text-sm leading-6" id="login-status" aria-live="polite" data-tone={statusTone}>
             {status}
           </div>
 
-          <button className="btn btn-primary btn-lg login-submit" type="submit" data-submit-button disabled={submitting}>
+          <button className="btn btn-primary btn-lg login-submit inline-flex w-full items-center justify-center rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-70" type="submit" data-submit-button disabled={submitting}>
             {submitting ? 'Logging in…' : 'Sign in'}
           </button>
         </form>
 
-        <p className="login-card__hint">
+        <p className="login-card__hint text-center text-xs uppercase tracking-[0.2em] text-slate-400">
           Use your authorized school admin credentials.
         </p>
       </section>
