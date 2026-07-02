@@ -1,36 +1,33 @@
 from __future__ import annotations
 
 import argparse
-import sqlite3
+import os
 import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_DB_PATH = PROJECT_ROOT / "data" / "eduguard.db"
 
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from app.db.connection import get_connection
 from app.core.audit_chain import verify_chain
-
-
-def _open_database(db_path: Path) -> sqlite3.Connection:
-    connection = sqlite3.connect(str(db_path))
-    connection.row_factory = sqlite3.Row
-    return connection
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Verify EduGuard audit log chain integrity")
-    parser.add_argument("--db", default=str(DEFAULT_DB_PATH), help="Path to the SQLite database")
+    parser.add_argument("--db", default="", help="Path to the SQLite database (optional; defaults to DATABASE_URL or local SQLite)")
     args = parser.parse_args()
 
-    db_path = Path(args.db)
-    if not db_path.exists():
-        print(f"CHAIN BROKEN at entry ID 0 (database not found: {db_path})")
-        return 1
+    if args.db:
+        db_path = Path(args.db)
+        if not db_path.exists():
+            print(f"CHAIN BROKEN at entry ID 0 (database not found: {db_path})")
+            return 1
+        connection = get_connection(str(db_path))
+    else:
+        connection = get_connection(os.environ.get("DATABASE_URL", "").strip() or None)
 
-    connection = _open_database(db_path)
     try:
         result = verify_chain(connection)
     finally:

@@ -13,6 +13,5 @@ werkzeug==3.0.3
 # App server (local / non-Vercel production use)
 gunicorn==23.0.0
 
-# Database driver choice is intentionally left commented because the current codebase uses SQLite stdlib.
-# psycopg2-binary==2.9.9    # PostgreSQL
+psycopg2-binary==2.9.9    # PostgreSQL
 # pymongo==4.7.2            # MongoDB alternative
