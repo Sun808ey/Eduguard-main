@@ -2,8 +2,10 @@
 
 This repository now uses a clearer split between the backend and frontend:
 
+PROJECT TITLE: DEVELOPING AN ANDROID OFFLINE-FIRST SCHOOL-OWNED PHONE USE POLICY ENFORCEMENT SYSTEM FOR EDUCATION IN UGANDAN SECONDARY SCHOOLS. A LOCAL CONTEXT-BASED PROOF OF CONCEPT MVP FOR THE AWARD OF BACHELOR OF SCIENCE IN COMPUTER SECURITY AND FORENSICS.
+
 - `backend/` contains the Flask backend, tests, and scripts.
-- `backend/services/nest-api/` contains a NestJS starter service.
+- `backend/services/nest-api/` is a non-primary sidecar/archive starter service and is not the active enforcement backend.
 - `frontend/` contains the React/Vite frontend and static web assets.
 - `frontend/apps/mdm-legacy/` keeps the legacy frontend copy for rollback-safe transition.
 - `docs/` contains shared architecture notes and API contracts.
