@@ -27,5 +27,11 @@ npm install
 npm run dev
 ```
 
-The frontend keeps its offline fallback behavior, and the backend continues to serve the app shell in production.
+The frontend keeps its offline fallback behavior. For the migration path, the backend is intended to move to Render with PostgreSQL (Neon), and the frontend should be treated as a separate deployment target.
+
+Backend deployment contract for the next migration step:
+- Target runtime: Flask on Render with Gunicorn.
+- Target database: Neon PostgreSQL.
+- Required backend env vars: `FLASK_SECRET_KEY`, `JWT_SECRET`, `DATABASE_URL`, `VERCEL_ENV`.
+- Keep the current API behavior stable during setup; do not change database semantics in this step.
 
