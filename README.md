@@ -8,6 +8,12 @@ This repository now uses a clearer split between the backend and frontend:
 - `frontend/apps/mdm-legacy/` keeps the legacy frontend copy for rollback-safe transition.
 - `docs/` contains shared architecture notes and API contracts.
 
+Central documentation:
+
+- `docs/architecture.md`
+- `docs/api-contracts.md`
+- `docs/architecture-mdm.md`
+
 Run the backend and frontend from their own roots:
 
 ```powershell

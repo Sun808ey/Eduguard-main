@@ -2,6 +2,11 @@
 
 This document captures the active backend surface owned by `backend/`.
 
+Related docs:
+
+- [architecture.md](architecture.md) for system ownership and component boundaries.
+- [architecture-mdm.md](architecture-mdm.md) for legacy frontend notes.
+
 ## Authentication
 
 - `POST /api/auth/login`
