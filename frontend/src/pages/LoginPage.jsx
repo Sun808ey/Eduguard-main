@@ -4,10 +4,10 @@ import PropTypes from 'prop-types';
 import { Badge, logoUrl } from '../components/ui.jsx';
 import { useBodyClass } from '../hooks/useBodyClass.js';
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js';
+import { clearAuthSession, storeAuthSession } from '../lib/auth-session.js';
+import { AuthRequestError, loginAdmin } from '../services/auth.js';
 
-const EXPECTED_EMAIL = 'admin@eduguard-system.ug';
-const EXPECTED_PASSWORD = 'EduGuard2025';
-const EXPECTED_OTP = '246810';
+const ADMIN_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function LoginPage() {
   useBodyClass('login-page');
@@ -16,108 +16,87 @@ function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [otpDigits, setOtpDigits] = React.useState(['', '', '', '', '', '']);
-  const [showOtp, setShowOtp] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
   const [status, setStatus] = React.useState('');
   const [statusTone, setStatusTone] = React.useState('default');
-  const [errors, setErrors] = React.useState({ email: '', password: '', otp: '' });
+  const [errors, setErrors] = React.useState({ email: '', password: '' });
   const [submitting, setSubmitting] = React.useState(false);
-  const otpRefs = React.useRef([]);
   const passwordRef = React.useRef(null);
 
-  const focusOtp = (index = 0) => {
-    const node = otpRefs.current[index] || otpRefs.current.find(Boolean);
-    node?.focus();
-  };
-
-  const handleDigitChange = (index, value) => {
-    const nextDigits = [...otpDigits];
-    nextDigits[index] = value.replace(/\D/g, '').slice(0, 1);
-    setOtpDigits(nextDigits);
-    setErrors((current) => ({ ...current, otp: '' }));
-    if (nextDigits[index] && index < otpRefs.current.length - 1) {
-      window.requestAnimationFrame(() => focusOtp(index + 1));
-    }
-  };
-
-  const handleDigitKeyDown = (index, event) => {
-    if (event.key === 'Backspace' && !otpDigits[index] && index > 0) {
-      focusOtp(index - 1);
-    }
-  };
-
-  const handlePaste = (event) => {
-    const pasted = event.clipboardData?.getData('text') || '';
-    const digits = pasted.replace(/\D/g, '').slice(0, 6).split('');
-    if (!digits.length) return;
-    event.preventDefault();
-    const nextDigits = Array.from({ length: 6 }, (_, index) => digits[index] || '');
-    setOtpDigits(nextDigits);
-    window.requestAnimationFrame(() => focusOtp(digits.length < 6 ? digits.length : 5));
-  };
-
   const resetErrors = () => {
-    setErrors({ email: '', password: '', otp: '' });
+    setErrors({ email: '', password: '' });
   };
 
-  const handleSubmit = (event) => {
+  const validateIdentityStep = () => {
+    const nextErrors = { email: '', password: '' };
+    const normalizedEmail = email.trim().toLowerCase();
+    const trimmedPassword = password.trim();
+    let valid = true;
+
+    if (!normalizedEmail) {
+      nextErrors.email = 'Enter the admin email address.';
+      valid = false;
+    } else if (!ADMIN_EMAIL_PATTERN.test(normalizedEmail)) {
+      nextErrors.email = 'Enter a valid email address.';
+      valid = false;
+    }
+
+    if (!trimmedPassword) {
+      nextErrors.password = 'Enter the admin password.';
+      valid = false;
+    } else if (trimmedPassword.length < 8) {
+      nextErrors.password = 'Password must be at least 8 characters.';
+      valid = false;
+    }
+
+    return { valid, nextErrors, normalizedEmail, trimmedPassword };
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (submitting) return;
 
     resetErrors();
-    const emailValue = email.trim().toLowerCase();
-    const passwordValue = password.trim();
 
-    if (!showOtp) {
-      let valid = true;
-      const nextErrors = { email: '', password: '', otp: '' };
+    const { valid, nextErrors, normalizedEmail, trimmedPassword } = validateIdentityStep();
+    setErrors(nextErrors);
 
-      if (!emailValue || emailValue !== EXPECTED_EMAIL) {
-        nextErrors.email = 'Use the admin email provided for the prototype.';
-        valid = false;
-      }
-
-      if (!passwordValue || passwordValue !== EXPECTED_PASSWORD) {
-        nextErrors.password = 'Use the mock password provided for the prototype.';
-        valid = false;
-      }
-
-      setErrors(nextErrors);
-      if (!valid) {
-        setStatus('Check your credentials and try again.');
-        setStatusTone('error');
-        return;
-      }
-
-      setShowOtp(true);
-      setStatus('Credentials accepted. Enter the 2FA code to continue.');
-      setStatusTone('info');
-      window.requestAnimationFrame(() => focusOtp(0));
-      return;
-    }
-
-    const otpValue = otpDigits.join('');
-    if (otpValue.length !== 6) {
-      setErrors((current) => ({ ...current, otp: 'Enter all 6 digits of the demo code.' }));
-      setStatus('2FA code incomplete.');
+    if (!valid) {
+      setStatus('Check the email address and password, then try again.');
       setStatusTone('error');
-      focusOtp(0);
-      return;
-    }
-
-    if (otpValue !== EXPECTED_OTP) {
-      setErrors((current) => ({ ...current, otp: 'Invalid 2FA code for this demo.' }));
-      setStatus('2FA verification failed.');
-      setStatusTone('error');
-      focusOtp(0);
       return;
     }
 
     setSubmitting(true);
-    setStatus('Authentication successful. Redirecting to dashboard…');
-    setStatusTone('success');
-    window.setTimeout(() => navigate('/dashboard'), 1100);
+
+    try {
+      setStatus('Contacting authentication service…');
+      setStatusTone('info');
+
+      const response = await loginAdmin(normalizedEmail, trimmedPassword);
+      clearAuthSession();
+      storeAuthSession({
+        accessToken: response.access_token,
+        refreshToken: response.refresh_token,
+        role: response.role,
+        username: normalizedEmail,
+        expiresInSeconds: response.expires_in,
+      });
+
+      setStatus('Authentication successful. Redirecting to dashboard…');
+      setStatusTone('success');
+      window.setTimeout(() => navigate('/dashboard'), 1100);
+    } catch (error) {
+      const message = error instanceof AuthRequestError && error.message ? error.message : 'Authentication failed. Please try again.';
+      setStatus(message);
+      setStatusTone('error');
+      setErrors((current) => ({
+        ...current,
+        password: message.toLowerCase().includes('invalid') ? 'Invalid admin credentials.' : current.password,
+      }));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -132,7 +111,7 @@ function LoginPage() {
         </div>
 
         <p className="login-card__intro">
-          Sign in with your school admin account, then confirm the 2FA code to continue to the dashboard.
+          Sign in with your school admin account to continue to the dashboard.
         </p>
 
         <form className="login-form" noValidate onSubmit={handleSubmit}>
@@ -145,6 +124,8 @@ function LoginPage() {
               autoComplete="username"
               placeholder="admin@eduguard-system.ug"
               required
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby="email-error"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
             />
@@ -162,6 +143,10 @@ function LoginPage() {
                 autoComplete="current-password"
                 placeholder="EduGuard2025"
                 required
+                minLength={8}
+                maxLength={128}
+                aria-invalid={Boolean(errors.password)}
+                aria-describedby="password-error"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
               />
@@ -177,40 +162,6 @@ function LoginPage() {
             <p className="field-error" id="password-error" aria-live="polite">{errors.password}</p>
           </div>
 
-          <div className="twofa-step" data-twofa-step hidden={!showOtp}>
-            <div className="twofa-step__header">
-              <div>
-                <h2>2FA verification</h2>
-                <p>Enter the 6-digit demo code to continue. This step simulates TOTP verification for the prototype.</p>
-              </div>
-              <Badge tone="syncing">2FA required</Badge>
-            </div>
-
-            <div className="otp-group" role="group" aria-label="Two factor authentication code">
-              {otpDigits.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(node) => {
-                    otpRefs.current[index] = node;
-                  }}
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  maxLength="1"
-                  aria-label={`Digit ${index + 1}`}
-                  data-otp-input
-                  value={digit}
-                  onChange={(event) => handleDigitChange(index, event.target.value)}
-                  onKeyDown={(event) => handleDigitKeyDown(index, event)}
-                  onPaste={handlePaste}
-                />
-              ))}
-            </div>
-
-            <p className="twofa-note">Demo TOTP code: <strong>246810</strong></p>
-            <p className="field-error" id="otp-error" aria-live="polite">{errors.otp}</p>
-          </div>
-
           <div className="login-status" id="login-status" aria-live="polite" data-tone={statusTone}>
             {status}
           </div>
@@ -221,7 +172,7 @@ function LoginPage() {
         </form>
 
         <p className="login-card__hint">
-          Mock credentials: <strong>admin@eduguard-system.ug</strong> / <strong>EduGuard2025</strong>
+          Use your authorized school admin credentials.
         </p>
       </section>
     </main>
