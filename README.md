@@ -1,6 +1,6 @@
-# EduGuard Main Repository
+# EduGuard Main Repo
 
-This repository now uses a clearer split between the backend and frontend:
+This repository  uses a clear split between the backend and frontend.
 
 PROJECT TITLE: DEVELOPING AN ANDROID OFFLINE-FIRST SCHOOL-OWNED PHONE USE POLICY ENFORCEMENT SYSTEM FOR EDUCATION IN UGANDAN SECONDARY SCHOOLS. A LOCAL CONTEXT-BASED PROOF OF CONCEPT MVP FOR THE AWARD OF BACHELOR OF SCIENCE IN COMPUTER SECURITY AND FORENSICS.
 
@@ -19,7 +19,7 @@ Central documentation:
 Run the backend and frontend from their own roots:
 
 ```powershell
-cd "c:\Users\SUN\Downloads\Compressed\Eduguard-main\Eduguard-main"
+
 python -m pytest backend/tests/test_smoke.py
 
 npm install
@@ -32,19 +32,18 @@ Deployment contract for the Render migration:
 - Backend blueprint: [render.yaml](render.yaml).
 
 - Database platform: Neon PostgreSQL.
-- Frontend platform: keep Vercel or another static host as a separate deployment target.
+- Frontend platform: keep Vercel as a separate deployment target.
 - Required backend env vars: `APP_ENV`, `FLASK_SECRET_KEY`, `JWT_SECRET`, `DATABASE_URL`, `CORS_ALLOWED_ORIGINS`.
 
 For local frontend development:
 
 ```powershell
-cd "c:\Users\SUN\Downloads\Compressed\Eduguard-main\Eduguard-main\frontend"
+
 npm install
 npm run dev
 ```
 
-The frontend keeps its offline fallback behavior. The backend is now documented as a Render deployment target instead of a Vercel serverless function.
-
+The frontend keeps its offline fallback behavior. The backend is now documented as a Render deployment target
 Backend deployment contract for the next migration step:
 
 - Target runtime: Flask on Render with Gunicorn.
